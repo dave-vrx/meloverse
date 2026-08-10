@@ -463,8 +463,8 @@ function checkAchievements(){
   for(const a of ACH){
     if(G.save.ach.includes(a.id)) continue;
     if(a.need()){
-      G.save.ach.push(a.id); G.save.crystals+=a.give;
-      toast(a.n+' unlocked! +'+a.give+' 💎','🏆');
+      G.save.ach.push(a.id); G.save.crystals+=a.g;
+      toast(a.n+' unlocked! +'+a.g+' 💎','🏆');
       beepAch();
     }
   }
