@@ -1176,8 +1176,9 @@ function submitName(){
 }
 async function resetGame(){
   if(!confirm('Reset ALL progress and remove your leaderboard entry?')) return;
+  G.save.name='';
   try{ if(typeof Leaderboard!=='undefined'&&Leaderboard.removeMe) await Leaderboard.removeMe(); }catch(e){}
-  localStorage.removeItem('suikaver_save'); localStorage.removeItem('meloverse_save');
+  try{ localStorage.removeItem('suikaver_save'); localStorage.removeItem('meloverse_save'); }catch(e){}
   location.reload();
 }
 
@@ -1411,7 +1412,12 @@ function updateBossUI(){
 }
 function updateBossTimer(){
   const t=$('bossTimer');
-  if(t) t.textContent='in '+fmtDur(Math.max(0,(G.save.boss.nextAt-Date.now())/1000));
+  if(!t) return;
+  if(bossActive&&G.save.boss.hp>0){
+    t.textContent='⏱ '+fmtDur(Math.max(0,(G.save.boss.fightUntil-Date.now())/1000));
+  }else{
+    t.textContent='in '+fmtDur(Math.max(0,(G.save.boss.nextAt-Date.now())/1000));
+  }
 }
 function initBoss(){
   const w=$('bossWrap'); if(!w) return;
@@ -1420,6 +1426,7 @@ function initBoss(){
 function bossTick(){
   const now=Date.now(), b=G.save.boss;
   if(bossActive){
+    if(G.tick%2===0) updateBossTimer();
     if(b.hp>0&&now>G.save.boss.fightUntil){
       const w=$('bossWrap');
       if(w&&!w.classList.contains('hidden')){
@@ -1457,15 +1464,10 @@ function tick(){
 
 function bindEvents(){
   const mb=$('melonBtn');
-  let lastPt={x:innerWidth/2,y:innerHeight/3}, holdTimer=null;
   mb.addEventListener('pointerdown',e=>{
     e.preventDefault();
-    lastPt={x:e.clientX,y:e.clientY};
     onMelonClick(e.clientX,e.clientY);
-    clearInterval(holdTimer);
-    holdTimer=setInterval(()=>onMelonClick(lastPt.x,lastPt.y),150);
   });
-  ['pointerup','pointerleave','pointercancel'].forEach(ev=>mb.addEventListener(ev,()=>clearInterval(holdTimer)));
   mb.addEventListener('contextmenu',e=>e.preventDefault());
 
   $('goldenMelon').addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); clickGolden(); });

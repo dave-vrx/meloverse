@@ -17,7 +17,10 @@ const Leaderboard = (()=>{
 
   function getMyId(){
     if(!myId){
-      myId=G.save.playerId||('p'+Math.random().toString(36).slice(2,10));
+      let pid=null;
+      try{ pid=localStorage.getItem('suikaver_pid'); }catch(e){}
+      myId=pid||G.save.playerId||('p'+Math.random().toString(36).slice(2,10));
+      try{ localStorage.setItem('suikaver_pid',myId); }catch(e){}
       G.save.playerId=myId;
     }
     return myId;
@@ -103,21 +106,24 @@ const Leaderboard = (()=>{
 
   async function removeMe(){
     try{
-      const id=G.save.playerId||myId;
+      const id=getMyId();
       const r=await fetch(URL,{cache:'no-store'});
-      if(!r.ok) return;
+      if(!r.ok) return false;
       const data=await r.json();
       const arr=(data&&Array.isArray(data.scores))?data.scores:[];
       const filtered=arr.filter(s=>s.id!==id);
       if(filtered.length<arr.length){
-        await fetch(URL,{
+        const p=await fetch(URL,{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({scores:filtered,updated:Date.now()})
         });
+        if(!p.ok) return false;
         scores=filtered;
+        render();
       }
-    }catch(e){}
+      return true;
+    }catch(e){ return false; }
   }
 
   function render(){
