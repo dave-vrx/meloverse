@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0b0620">
-<meta name="description" content="Meloverse — the cosmic idle melon empire. Tap melons, grow a galaxy, climb the global leaderboard. Made by Dave-VR.">
-<title>MELOVERSE 🍈 | Cosmic Idle Empire</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍈</text></svg>">
+<meta name="theme-color" content="#07130c">
+<meta name="description" content="SUIKAVERSE — the all-in-one watermelon multiverse. Idle farming, the full Suika merge game, mini games, quests, skins, chat and a live global leaderboard. Made by Dave-VR.">
+<title>SUIKAVERSE 🍉 | Watermelon Idle Multiverse</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍉</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body data-view="play">
+<body data-view="grow">
 
 <canvas id="space"></canvas>
 <div class="nebula neb1"></div>
@@ -20,70 +20,71 @@
 
 <!-- ======= TOP BAR ======= -->
 <header id="topbar">
-  <div class="logo" onclick="openNameModal(true)">🍈 <span>MELOVERSE</span><em>idle empire</em></div>
+  <div class="logo" onclick="openNameModal()">🍉 <span>SUIKA</span><b>VERSE</b><em>idle multiverse</em></div>
   <div class="hud">
-    <button class="chip name-chip" id="btnName" onclick="openNameModal(true)">
-      <span class="chip-emoji">👤</span><span id="hudName">PLAYER</span>
+    <button class="chip name-chip" id="btnName" onclick="openNameModal()">
+      <span class="chip-emoji" id="hudAvatar">🍉</span><span id="hudName">PLAYER</span>
+      <span class="lv-pill" id="hudLevel">Lv1</span>
     </button>
-    <button class="chip" title="Crystals" onclick="switchCenterTab('shop')">
+    <button class="chip" title="Crystals" onclick="setView('grow');switchGrowTab('shop')">
       <span class="chip-emoji">💎</span><span id="hudCrystals">0</span>
     </button>
-    <button class="chip" title="Seeds (Prestige)" onclick="switchCenterTab('ascend')">
+    <button class="chip" title="Seeds (Prestige)" onclick="setView('grow');switchGrowTab('ascend')">
       <span class="chip-emoji">🌱</span><span id="hudSeeds">0</span>
     </button>
-    <button class="chip rank-chip" id="hudRank" title="Your rank" onclick="goRank()">
-      <span class="chip-emoji" id="hudRankEmoji">🐣</span><span id="hudRankName">Seedling</span>
+    <button class="chip" id="hudCrates" title="Crates to open" onclick="setView('quests')">
+      <span class="chip-emoji">📦</span><span id="hudCrateN">0</span>
     </button>
     <button class="chip icon-only" id="btnSound" onclick="toggleSound()" title="Sound">🔊</button>
   </div>
 </header>
 
+<!-- ======= SIDEBAR NAV (desktop) ======= -->
+<nav id="sidebar">
+  <button data-view="grow" class="on" onclick="setView('grow')">🍉<span>Grow</span></button>
+  <button data-view="mini" onclick="setView('mini')">🕹️<span>Mini Games</span></button>
+  <button data-view="quests" onclick="setView('quests')">🎯<span>Quests</span></button>
+  <button data-view="board" onclick="setView('board')">🏆<span>Board</span></button>
+  <button data-view="chat" onclick="setView('chat')">💬<span>Chat</span></button>
+  <button data-view="more" onclick="setView('more')">📖<span>Help</span></button>
+</nav>
+
 <!-- ======= MAIN ======= -->
 <main>
 
-  <!-- ===== FARM (left) ===== -->
-  <section id="view-farm" class="panel">
-    <div class="panel-head">
-      <h2>🧺 Melon Farm</h2>
-      <div class="seg" id="buyToggle">
-        <button data-n="1" class="on">×1</button>
-        <button data-n="10">×10</button>
-        <button data-n="25">×25</button>
-        <button data-n="100">×100</button>
-      </div>
+  <!-- ===== GROW ===== -->
+  <section id="view-grow" class="view">
+    <div class="event-banner hidden" id="eventBanner" onclick="collectEventReward()">
+      <span id="eventText">EVENT!</span><span id="eventTimer"></span>
     </div>
-    <div class="scroll-area" id="buildings"></div>
-  </section>
 
-  <!-- ===== PLAY (center) ===== -->
-  <section id="view-play" class="panel main-panel">
     <div class="melon-stage">
       <div class="boost-pill" id="boostPill" style="display:none"></div>
-      <button id="melonBtn" aria-label="Tap the melon">
+      <button id="melonBtn" aria-label="Tap the watermelon">
         <svg id="melonSvg" viewBox="0 0 120 120" width="100%" height="100%">
           <defs>
-            <linearGradient id="rind" x1="0" y1="0" x2="0.7" y2="1">
-              <stop offset="0" stop-color="#58c94f"/>
-              <stop offset="0.55" stop-color="#2f8f3a"/>
-              <stop offset="1" stop-color="#17602a"/>
+            <linearGradient id="rindG" x1="0" y1="0" x2="0.7" y2="1">
+              <stop offset="0" stop-color="var(--r1)"/>
+              <stop offset="0.55" stop-color="var(--r2)"/>
+              <stop offset="1" stop-color="var(--r3)"/>
             </linearGradient>
-            <radialGradient id="shine" cx="0.32" cy="0.22" r="0.9">
+            <radialGradient id="shineG" cx="0.32" cy="0.22" r="0.9">
               <stop offset="0" stop-color="#ffffff" stop-opacity="0.5"/>
               <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.08"/>
               <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
             </radialGradient>
-            <linearGradient id="strip" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#1b4d26"/>
-              <stop offset="1" stop-color="#0f3018"/>
+            <linearGradient id="stripG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="var(--s1)"/>
+              <stop offset="1" stop-color="var(--s2)"/>
             </linearGradient>
           </defs>
-          <path d="M60 20 q4 -9 14 -7 q-8 7 -14 7z" fill="#3f8f3f" stroke="#27602a" stroke-width="1.5"/>
-          <ellipse cx="60" cy="63" rx="47" ry="40" fill="url(#rind)"/>
-          <path d="M32 42 q11 24 3 46" stroke="url(#strip)" stroke-width="8" fill="none" stroke-linecap="round"/>
-          <path d="M49 33 q11 32 2 60" stroke="url(#strip)" stroke-width="8" fill="none" stroke-linecap="round"/>
-          <path d="M71 33 q-11 32 -2 60" stroke="url(#strip)" stroke-width="8" fill="none" stroke-linecap="round"/>
-          <path d="M88 42 q-11 24 -3 46" stroke="url(#strip)" stroke-width="8" fill="none" stroke-linecap="round"/>
-          <ellipse cx="60" cy="63" rx="47" ry="40" fill="url(#shine)"/>
+          <path d="M60 20 q4 -9 14 -7 q-8 7 -14 7z" fill="var(--stem)" stroke="var(--s2)" stroke-width="1.5"/>
+          <ellipse cx="60" cy="63" rx="47" ry="40" fill="url(#rindG)"/>
+          <path d="M32 42 q11 24 3 46" stroke="url(#stripG)" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M49 33 q11 32 2 60" stroke="url(#stripG)" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M71 33 q-11 32 -2 60" stroke="url(#stripG)" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M88 42 q-11 24 -3 46" stroke="url(#stripG)" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <ellipse cx="60" cy="63" rx="47" ry="40" fill="url(#shineG)"/>
           <ellipse cx="60" cy="63" rx="47" ry="40" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2.5"/>
         </svg>
       </button>
@@ -96,51 +97,102 @@
       <div class="big-number" id="melonCount">0</div>
       <div class="substats">
         <span class="substat">⚡ <b id="perSec">0</b>/s</span>
-        <span class="substat">👆 <b id="perClick">1</b>/click</span>
+        <span class="substat">👆 <b id="perClick">1</b>/tap</span>
       </div>
     </div>
 
-    <nav class="center-tabs" id="centerTabs">
-      <button data-tab="upgrades" class="on">🔧 Upgrades</button>
-      <button data-tab="ascend">🌱 Ascend</button>
+    <nav class="center-tabs" id="growTabs">
+      <button data-tab="farm" class="on">🧺 Farm</button>
+      <button data-tab="upgrades">🔧 Upgrades</button>
+      <button data-tab="ascend">⭐ Prestige</button>
       <button data-tab="shop">💎 Shop</button>
     </nav>
 
-    <div class="tab-panels scroll-area">
-      <div id="tab-upgrades" class="tab on"></div>
+    <div class="tab-panels">
+      <div id="tab-farm" class="tab on">
+        <div class="panel-head">
+          <h2>🧺 Melon Farm</h2>
+          <div class="seg" id="buyToggle">
+            <button data-n="1" class="on">×1</button>
+            <button data-n="10">×10</button>
+            <button data-n="25">×25</button>
+            <button data-n="100">×100</button>
+          </div>
+        </div>
+        <div class="scroll-area" id="buildings"></div>
+      </div>
+      <div id="tab-upgrades" class="tab"></div>
       <div id="tab-ascend" class="tab"></div>
       <div id="tab-shop" class="tab"></div>
     </div>
   </section>
 
-  <!-- ===== RIGHT COLUMN ===== -->
-  <div id="rightCol">
+  <!-- ===== MINI GAMES ===== -->
+  <section id="view-mini" class="view">
+    <div class="view-head">
+      <h2>🕹️ Mini Games</h2>
+      <p>Play for fun, earn melons, seeds &amp; rare drops. Rewards are boosted ×3 during <b>Fruit Rush</b> events!</p>
+    </div>
+    <nav class="center-tabs" id="miniTabs">
+      <button data-m="suika" class="on">🍉 Suika</button>
+      <button data-m="whack">🔨 Whack</button>
+      <button data-m="roulette">🎡 Roulette</button>
+    </nav>
 
-    <!-- ===== RANK / LEADERBOARD ===== -->
-    <section id="view-rank" class="panel">
-      <div class="panel-head">
-        <h2>🏆 Galaxy Leaderboard</h2>
-        <div class="mini-actions">
-          <button id="lbRefresh" onclick="refreshLeaderboard()" title="Refresh">↻</button>
+    <div id="mini-suika" class="mini on">
+      <div class="suika-hud">
+        <div class="sstat"><span>💯 Score</span><b id="score">0</b></div>
+        <div class="sstat"><span>🏆 Best</span><b id="best">0</b></div>
+        <div class="sstat sstat-next"><span>Next</span><span class="next-bubble"><canvas id="nextCanvas" width="100" height="100"></canvas></span></div>
+      </div>
+      <div class="suika-wrap">
+        <canvas id="suikaCanvas" width="440" height="640"></canvas>
+        <div class="suika-overlay hidden" id="suikaOverlay">
+          <div class="suika-card">
+            <h3>Game Over!</h3>
+            <p>Score <b id="suikaFinal">0</b></p>
+            <p class="suika-reward" id="suikaReward"></p>
+            <p class="new-best" id="suikaNewBest" style="display:none">🏆 New Best!</p>
+            <div class="suika-stats" id="suikaStats"></div>
+            <button class="btn-primary" id="suikaRestart">Play Again</button>
+          </div>
         </div>
       </div>
-      <div class="rank-card" id="rankCard">
-        <div class="rank-icon" id="rankIcon">🐣</div>
-        <div class="rank-meta">
-          <div class="rank-title" id="rankTitle">Melon Seedling</div>
-          <div class="rank-progress"><div class="rank-bar" id="rankBar"></div></div>
-          <div class="rank-next">next rank at <b id="rankNext">1K</b> 🍈</div>
-        </div>
-      </div>
-      <div class="lb-status" id="lbStatus"></div>
-      <div class="scroll-area lb-list" id="lbList">
-        <div class="lb-empty">Loading galaxy… 🌌</div>
-      </div>
-    </section>
+      <p class="game-hint">Desktop: aim with mouse, click to drop · Mobile: drag to aim, release to drop · Space / ↑↓ to aim &amp; drop</p>
+      <div class="chain-wrap"><span class="chain-label">Merge chain</span><div class="fruit-chain" id="fruitChain"></div></div>
+      <p class="mini-tip">💡 Every Suika merge adds melons to your empire. Make a watermelon for a legendary drop!</p>
+    </div>
 
-    <!-- ===== AWARDS ===== -->
-    <section id="view-awards" class="panel">
-      <div class="panel-head"><h2>🎖️ Achievements</h2></div>
+    <div id="mini-whack" class="mini">
+      <div class="whack-head">
+        <div class="sstat"><span>⏱️ Time</span><b id="whackTimer">15s</b></div>
+        <div class="sstat"><span>🔨 Score</span><b id="whackScore">0</b></div>
+        <button class="btn-primary" id="whackStart">Start!</button>
+      </div>
+      <div class="whack-grid" id="whackGrid"></div>
+      <p class="game-hint">Whack every melon that pops up. Gold melons are worth ×5! Score becomes melons + drops.</p>
+    </div>
+
+    <div id="mini-roulette" class="mini">
+      <div class="roulette-card">
+        <div class="roulette-wheel" id="rouletteWheel">
+          <div class="wheel-arrow"></div>
+        </div>
+        <div class="roulette-result" id="rouletteResult"></div>
+        <button class="btn-primary" id="rouletteSpin">🎡 Spin — 10 💎</button>
+        <p class="game-hint">Wheels of fortune! Win up to 100 💎 or boost your next Suika run. Your crystals balance updates live on the leaderboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QUESTS ===== -->
+  <section id="view-quests" class="view">
+    <div class="view-head">
+      <h2>🎯 Quests &amp; Collection</h2>
+      <p>Complete quests for crystals &amp; XP, collect rare drops, and open crates. Locked items stay mysterious until found…</p>
+    </div>
+
+    <div class="quest-block">
       <div class="daily-card" id="dailyCard">
         <div class="daily-emoji">🎁</div>
         <div>
@@ -149,18 +201,127 @@
         </div>
         <button id="dailyBtn" onclick="claimDaily()">CLAIM</button>
       </div>
-      <div class="ach-grid scroll-area" id="achGrid"></div>
-    </section>
+    </div>
 
-  </div>
+    <div class="quest-block">
+      <h3>🗓️ Daily Quests <span class="reset-in" id="questReset">reset in --</span></h3>
+      <div id="dailyQuests"></div>
+    </div>
+
+    <div class="quest-block">
+      <h3>🌟 Story Quests</h3>
+      <div id="storyQuests"></div>
+    </div>
+
+    <div class="quest-block">
+      <h3>🎖️ Achievements</h3>
+      <div class="ach-grid" id="achGrid"></div>
+    </div>
+
+    <div class="quest-block">
+      <h3>📦 Inventory <button class="btn-ghost btn-sm" id="openCrateBtn" onclick="openCrate()">Open a crate (0)</button></h3>
+      <p class="quest-hint">Crates drop from clicking, buying, golden melons and mini games.</p>
+      <div id="invList"></div>
+    </div>
+
+    <div class="quest-block">
+      <h3>🗃️ Collection <span id="collCount" class="reset-in"></span></h3>
+      <div class="collection-grid" id="collectionGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== BOARD ===== -->
+  <section id="view-board" class="view">
+    <div class="view-head">
+      <h2>🏆 Galaxy Leaderboard</h2>
+      <p>Live board — updated in real time from the shared multiverse. Level up to climb the stack!</p>
+    </div>
+    <div class="rank-card" id="rankCard">
+      <div class="rank-icon" id="rankIcon">🐣</div>
+      <div class="rank-meta">
+        <div class="rank-title" id="rankTitle">Melon Seedling</div>
+        <div class="rank-progress"><div class="rank-bar" id="rankBar"></div></div>
+        <div class="rank-next">next level: <b id="rankNext">Lv 2</b></div>
+      </div>
+    </div>
+    <div class="board-toolbar">
+      <button class="btn-ghost btn-sm" id="lbRefresh" onclick="Leaderboard.refresh()">Refresh ⟳</button>
+      <span class="lb-status" id="lbStatus">Loading…</span>
+    </div>
+    <div class="scroll-area lb-list" id="lbList">
+      <div class="lb-empty">Loading galaxy… 🌌</div>
+    </div>
+  </section>
+
+  <!-- ===== CHAT ===== -->
+  <section id="view-chat" class="view">
+    <div class="view-head">
+      <h2>💬 Melon Chat</h2>
+      <p>Live chat for every melon farmer in the multiverse. Be kind! 🍉</p>
+    </div>
+    <div class="chat-status" id="chatStatus"></div>
+    <div class="chat-list" id="chatList">
+      <div class="lb-empty">Connecting to the multiverse… 🌌</div>
+    </div>
+    <div class="chat-input-row">
+      <input id="chatInput" maxlength="120" placeholder="Say something melon-y…" autocomplete="off">
+      <button id="chatSend" onclick="Chat.send()">Send</button>
+    </div>
+  </section>
+
+  <!-- ===== MORE / HELP ===== -->
+  <section id="view-more" class="view">
+    <div class="view-head">
+      <h2>📖 How to Play</h2>
+      <p>Everything you need to rule the watermelon multiverse.</p>
+    </div>
+
+    <div class="help-grid">
+      <div class="help-card"><span class="step-num">01</span><h3>Tap to harvest</h3><p>Tap the big watermelon to harvest melons. Tap power grows as you buy farms and upgrades.</p></div>
+      <div class="help-card"><span class="step-num">02</span><h3>Buy farms</h3><p>Farms produce melons every second — even while you're away. Double them with upgrades.</p></div>
+      <div class="help-card"><span class="step-num">03</span><h3>Prestige (⭐)</h3><p>Reach ~1M melons and Ascend to earn Seeds. Seeds permanently boost ALL production. Collect 10+ for powerful permanent upgrades.</p></div>
+      <div class="help-card"><span class="step-num">04</span><h3>Play Suika</h3><p>The classic watermelon-stacking game is built in! Every merge earns your empire melons. Chain combos, beat your best.</p></div>
+      <div class="help-card"><span class="step-num">05</span><h3>Quests &amp; drops</h3><p>Do quests for crystals &amp; XP. Clicks, buys and golden melons drop crates with rare collectibles. Fill your collection!</p></div>
+      <div class="help-card"><span class="step-num">06</span><h3>Level up</h3><p>Earn XP from everything. Every level = +2% production, +1% tap power and free crystals. Show it off on the board.</p></div>
+      <div class="help-card"><span class="step-num">07</span><h3>Skins &amp; currency</h3><p>Spend 💎 crystals on skins and boosts. Your live balance is shown on the leaderboard — buying updates it in real time.</p></div>
+      <div class="help-card"><span class="step-num">08</span><h3>Events</h3><p>Random global events hit the whole multiverse at once — Meteor Showers, Crystal Rains, Fruit Rushes and more. Catch them live!</p></div>
+    </div>
+
+    <div class="view-head"><h2>❓ FAQ</h2></div>
+    <div class="faq">
+      <details><summary>How do I save my progress?</summary><p>Automatically — it's saved in your browser's local storage every few seconds. No account needed. Clear your browser data and it's gone.</p></details>
+      <details><summary>Where does the leaderboard live?</summary><p>Every player shares one free keyless cloud store (MantleDB), so the board is truly global and updates in real time. Give it a few seconds to sync.</p></details>
+      <details><summary>What are Seeds and Prestige?</summary><p>When you Ascend you convert your run's melons into Seeds. Each seed gives +1% permanent production (upgradeable to +10%). It's the core end-game loop.</p></details>
+      <details><summary>How do I get crystals 💎?</summary><p>Daily rewards, achievements, quests, golden melons, crates, roulette and Suika milestones. Spend them on skins, boosts and permanent shop upgrades.</p></details>
+      <details><summary>How does the Suika mini game help my idle empire?</summary><p>Every fruit merge adds melons to your empire, big merges drop rare collectibles, and making a watermelon grants a legendary drop + crystals.</p></details>
+      <details><summary>What are the global events?</summary><p>Random timed events (Meteor Shower, Crystal Rain, Gold Rush, Fruit Rush, Turbo) affect the whole multiverse at once. Tap the banner when it appears.</p></details>
+      <details><summary>I found a bug!</summary><p>Tell Dave-VR! This game is hand-built with love (and melons) and every report makes it better.</p></details>
+    </div>
+
+    <div class="quest-block">
+      <h3>⚙️ Settings</h3>
+      <div class="settings-list">
+        <button class="btn-ghost" onclick="toggleSound()">🔊 Toggle Sound</button>
+        <button class="btn-ghost" onclick="resetGame()">🗑️ Reset All Progress</button>
+      </div>
+    </div>
+
+    <div class="about-box">
+      <div class="about-brand">🍉 SUIKA<span>VERSE</span></div>
+      <p>The all-in-one watermelon multiverse: idle farming, Suika stacking, mini games, quests, collection, skins and a live global chat + leaderboard.</p>
+      <p>Made with 💚 by <b>Dave-VR</b> — not affiliated with any other game or its creators.</p>
+    </div>
+  </section>
+
 </main>
 
 <!-- ======= BOTTOM NAV (mobile) ======= -->
 <nav class="bottom-nav" id="bottomNav">
-  <button data-view="farm" onclick="setView('farm')">🧺<span>Farm</span></button>
-  <button data-view="play" class="on" onclick="setView('play')">🍈<span>Play</span></button>
-  <button data-view="awards" onclick="setView('awards')">🎖️<span>Awards</span></button>
-  <button data-view="rank" onclick="setView('rank')">🏆<span>Ranks</span></button>
+  <button data-view="grow" class="on" onclick="setView('grow')">🍉<span>Grow</span></button>
+  <button data-view="mini" onclick="setView('mini')">🕹️<span>Mini</span></button>
+  <button data-view="quests" onclick="setView('quests')">🎯<span>Quests</span></button>
+  <button data-view="board" onclick="setView('board')">🏆<span>Board</span></button>
+  <button data-view="chat" onclick="setView('chat')">💬<span>Chat</span></button>
 </nav>
 
 <!-- Golden melon event -->
@@ -171,14 +332,14 @@
 <!-- ======= MODALS ======= -->
 <div class="modal-veil hidden" id="veilName">
   <div class="modal">
-    <div class="modal-emoji">🍈</div>
-    <h1>Welcome to MELOVERSE</h1>
-    <p class="modal-sub">Enter your name to join the galaxy leaderboard.<br>Progress is saved on this device — no account needed.</p>
+    <div class="modal-emoji">🍉</div>
+    <h1>Welcome to SUIKAVERSE</h1>
+    <p class="modal-sub">Enter your name to join the galaxy board &amp; chat.<br>Progress is saved on this device — no account needed.</p>
     <input id="nameInput" maxlength="16" placeholder="Your melon farmer name…" autocomplete="off">
     <div class="modal-actions">
-      <button class="btn-primary" id="nameGo" onclick="submitName()">🚀 Enter the Meloverse</button>
+      <button class="btn-primary" onclick="submitName()">🚀 Enter the Multiverse</button>
     </div>
-    <div class="modal-hint">Tip: tap the melon to harvest! Buy farms to harvest while you sleep.</div>
+    <div class="modal-hint">Tip: tap the watermelon to harvest! Then play Suika to stack even more.</div>
   </div>
 </div>
 
@@ -196,7 +357,7 @@
     <div class="modal-emoji">💤</div>
     <h1>Welcome back!</h1>
     <p class="modal-sub" id="offlineMsg">Your melons kept growing while you were away.</p>
-    <div class="modal-actions"><button class="btn-primary" onclick="closeModal('veilOffline')">Harvest! 🍈</button></div>
+    <div class="modal-actions"><button class="btn-primary" onclick="closeModal('veilOffline')">Harvest! 🍉</button></div>
   </div>
 </div>
 
@@ -204,7 +365,7 @@
   <div class="modal">
     <div class="modal-emoji">⭐</div>
     <h1>Ascend?</h1>
-    <p class="modal-sub">You will gain <b id="ascGainN">0</b> 🌱 seeds.<br>Seeds give <b>+1%</b> permanent production each (upgradeable).<br>Your melons, farms &amp; upgrades reset — achievements, crystals &amp; lifetime melons stay!</p>
+    <p class="modal-sub">You will gain <b id="ascGainN">0</b> 🌱 seeds.<br>Seeds give <b>+1%</b> permanent production each (upgradeable).<br>Your melons, farms &amp; upgrades reset — achievements, crystals, levels &amp; lifetime melons stay!</p>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeModal('veilAscend')">Not yet</button>
       <button class="btn-primary" onclick="doAscend()">⭐ ASCEND</button>
@@ -212,9 +373,23 @@
   </div>
 </div>
 
-<footer id="footer">🍈 <b>MELOVERSE</b> — cosmic idle melon empire &nbsp;·&nbsp; Made with 💚 by <b>Dave-VR</b> &nbsp;·&nbsp; <a href="#" onclick="resetGame();return false;" style="color:inherit">Reset</a></footer>
+<div class="modal-veil hidden" id="veilCrate">
+  <div class="modal">
+    <div class="modal-emoji" id="crateEmoji">📦</div>
+    <h1 id="crateName">Crate!</h1>
+    <p class="modal-sub" id="crateMsg"></p>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="crateAgain" onclick="openCrate()">Open next</button>
+      <button class="btn-primary" onclick="closeModal('veilCrate')">Nice!</button>
+    </div>
+  </div>
+</div>
+
+<footer id="footer">🍉 <b>SUIKA</b><b style="color:var(--acc)">VERSE</b> — watermelon idle multiverse &nbsp;·&nbsp; Made with 💚 by <b>Dave-VR</b> &nbsp;·&nbsp; <a href="#" onclick="resetGame();return false;" style="color:inherit">Reset</a></footer>
 
 <script src="game.js"></script>
 <script src="leaderboard.js"></script>
+<script src="chat.js"></script>
+<script src="suika.js"></script>
 </body>
 </html>

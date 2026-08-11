@@ -1,15 +1,14 @@
 'use strict';
 /* ============================================================
-   MELOVERSE — global leaderboard
+   SUIKAVERSE — global leaderboard
    Free, no-login cloud storage via MantleDB (keyless JSON store).
-   All players share one namespace so the board is truly global.
+   Shows player level, prestige (seeds/asc), skin avatar and a
+   live 💎 balance that updates in real time when you buy things.
    Made by Dave-VR
    ============================================================ */
 
 const Leaderboard = (()=>{
-  const NS  = 'meloverse';
-  const PATH= 'leaderboard';
-  const URL = 'https://mantledb.sh/v2/'+NS+'/'+PATH;
+  const URL='https://mantledb.sh/v2/suikaver/leaderboard';
 
   let scores=[];
   let myId='';
@@ -29,6 +28,11 @@ const Leaderboard = (()=>{
     if(el) el.textContent=t;
   }
 
+  function mySkinEmoji(){
+    const id=G.save.skin||'classic';
+    return {classic:'🍉',golden:'🥇',crystal:'💎',lava:'🌋',galaxy:'🌌',void:'⚫',mint:'🍃',royal:'👑',asc:'⭐',starbound:'✨',cosmic:'🕳️'}[id]||'🍉';
+  }
+
   function myEntry(){
     return {
       id:getMyId(),
@@ -36,6 +40,9 @@ const Leaderboard = (()=>{
       melons:Math.floor(G.save.lifetimeEarned||0),
       seeds:G.save.totalSeeds||0,
       asc:G.save.ascensions||0,
+      level:G.save.level||1,
+      crystals:Math.floor(G.save.crystals||0),
+      skin:mySkinEmoji(),
       upd:Date.now()
     };
   }
@@ -49,15 +56,15 @@ const Leaderboard = (()=>{
       setStatus(scores.length?('🌐 Synced · '+scores.length+' melon farmers'):'🌐 Be the first on the board!');
       render();
     }catch(e){
-      setStatus('📴 Offline mode — board paused (MantleDB unreachable)');
+      setStatus('📴 Offline — board paused (MantleDB unreachable)');
       if(!scores.length) render();
     }
   }
 
-  function submit(){
+  function submit(force){
     if(!initDone||!G.save.name) return;
     const now=Date.now();
-    if(now-lastSubmit<15000) return;
+    if(!force&&now-lastSubmit<15000) return;
     lastSubmit=now;
     const entry=myEntry();
     const arr=scores.filter(s=>s.id!==entry.id);
@@ -72,20 +79,22 @@ const Leaderboard = (()=>{
     render();
   }
 
+  let lastSubmitValue=0;
   function throttledSubmit(){
     if(!initDone) return;
     const v=G.save.lifetimeEarned||0;
     if(v>lastSubmitValue*1.001+5||v<lastSubmitValue*0.5){
       lastSubmitValue=v;
-      submit();
+      submit(false);
     }
   }
-  let lastSubmitValue=0;
 
-  function onNameChange(){
-    lastSubmitValue=-1;
-    submit();
+  function bump(){
+    lastSubmitValue=G.save.lifetimeEarned||0;
+    submit(true);
   }
+
+  function onNameChange(){ lastSubmitValue=-1; submit(true); }
 
   function render(){
     const list=document.getElementById('lbList');
@@ -100,31 +109,29 @@ const Leaderboard = (()=>{
     let html='';
     scores.slice(0,100).forEach((s,i)=>{
       if(s.id===me.id) myRank=i+1;
-      const extra=s.asc>0?('⭐ '+fmt(s.asc)+' asc'):'🍈 '+fmt(s.melons);
+      const extra=(s.asc>0?('⭐ '+s.asc+' · 🌱 '+fmt(s.seeds||0)):'🌱 '+fmt(s.seeds||0));
       html+='<div class="lb-row'+(s.id===me.id?' me':'')+'">'+
         '<span class="lb-pos">'+(i<3?medals[i]:'#'+(i+1))+'</span>'+
-        '<span class="lb-name">'+escapeHtml(s.name||'?')+'</span>'+
+        '<span class="lb-name"><span>'+(s.skin||'🍉')+'</span>'+escapeHtml(s.name||'?')+'<span class="lv-badge">Lv'+(s.level||1)+'</span></span>'+
         '<span class="lb-extra">'+extra+'</span>'+
-        '<span class="lb-score">'+fmt(s.melons)+'</span></div>';
+        '<span class="lb-score">'+fmt(s.melons)+'</span>'+
+        '<span class="lb-crys">💎 '+fmt(s.crystals||0)+'</span></div>';
     });
     list.innerHTML=html;
     if(myRank<0) myRank=scores.findIndex(s=>s.id===me.id)+1;
     if(myRank<=0) myRank=scores.length+1;
     G.myRank=myRank;
-    setStatus('You are #'+myRank+' of '+scores.length+' · 🌐');
-    if(typeof renderRankCard==='function') renderRankCard();
+    setStatus('You are #'+myRank+' of '+scores.length+' · refresh every 20s ⟳');
   }
 
-  function refresh(){
-    fetchBoard();
-  }
+  function refresh(){ fetchBoard(); }
 
   function init(){
     getMyId();
     initDone=true;
     fetchBoard();
-    setInterval(()=>{ if(typeof G!=='undefined'&&G.save) submit(); },60000);
+    setInterval(()=>{ if(typeof G!=='undefined'&&G.save) submit(false); },20000);
   }
 
-  return {init,refresh,submit,throttledSubmit,onNameChange,render};
+  return {init,refresh,submit,bump,throttledSubmit,onNameChange,render};
 })();
