@@ -464,6 +464,26 @@ function toast(msg,icon){
 }
 function openModal(id){ $(id).classList.remove('hidden'); }
 function closeModal(id){ $(id).classList.add('hidden'); }
+
+/* ---------------- PWA install ---------------- */
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredInstallPrompt=e; });
+function isStandalone(){
+  return (navigator.standalone===true)||(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches);
+}
+function showInstallHelp(){
+  if(deferredInstallPrompt){
+    const p=deferredInstallPrompt;
+    deferredInstallPrompt=null;
+    p.prompt();
+    return;
+  }
+  openModal('veilInstall');
+}
+function initInstallBtn(){
+  const b=$('installBtn');
+  if(b&&isStandalone()) b.style.display='none';
+}
 function setView(v){
   document.body.dataset.view=v;
   document.querySelectorAll('#bottomNav button,#sidebar button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
@@ -1192,6 +1212,7 @@ function postBoot(){
   Chat.init&&Chat.init();
   checkOffline();
   checkDaily();
+  initInstallBtn();
 }
 
 /* ---------------- particles ---------------- */
@@ -1434,6 +1455,17 @@ function bossTick(){
         toast('The boss got away! '+b.emoji,'💨');
         G.save.boss.nextAt=now+bossNextDelay();
       }
+    }
+    return;
+  }
+  if(b.hp>0){
+    if(now>b.fightUntil){
+      b.hp=0; b.maxHp=0; b.id=null; b.fightUntil=0;
+      b.nextAt=now+bossNextDelay();
+      saveGame();
+    }else{
+      bossActive=true;
+      updateBossUI();
     }
     return;
   }

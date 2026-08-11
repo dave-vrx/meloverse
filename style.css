@@ -495,6 +495,7 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
 }
 .modal input:focus{border-color:var(--acc)}
 .modal-actions{display:flex;gap:10px;justify-content:center}
+.install-btn{width:100%;margin-top:10px}
 .modal-hint{color:var(--dim);font-size:.7rem;margin-top:12px}
 .tut-steps{display:flex;flex-direction:column;gap:9px;margin:4px 0 16px;text-align:left}
 .tut-step{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px}

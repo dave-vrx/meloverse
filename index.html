@@ -6,12 +6,18 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#07130c">
 <meta name="description" content="SUIKAVERSE — the all-in-one watermelon multiverse. Idle farming, the full Suika merge game, mini games, quests, skins, chat and a live global leaderboard. Made by Dave-VR.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SUIKAVERSE">
 <title>SUIKAVERSE 🍉 | Watermelon Idle Multiverse</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍉</text></svg>">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20260811">
 </head>
 <body data-view="grow">
 
@@ -384,7 +390,23 @@
     <div class="modal-actions">
       <button class="btn-primary" onclick="submitName()">🚀 Enter the Multiverse</button>
     </div>
+    <button class="btn-ghost install-btn" id="installBtn" onclick="showInstallHelp()">📲 Add to Home Screen</button>
     <div class="modal-hint">Tip: tap the watermelon to harvest! Then play Suika to stack even more.</div>
+  </div>
+</div>
+
+<div class="modal-veil hidden" id="veilInstall">
+  <div class="modal">
+    <div class="modal-emoji">📲</div>
+    <h1>Install SUIKAVERSE</h1>
+    <div class="tut-steps">
+      <div class="tut-step"><span class="ts-emoji">1️⃣</span><div><div class="ts-title">Tap the Share button</div><div class="ts-desc">It's the square-with-arrow at the bottom of the browser.</div></div></div>
+      <div class="tut-step"><span class="ts-emoji">2️⃣</span><div><div class="ts-title">Choose “Add to Home Screen”</div><div class="ts-desc">Scroll the Share menu and tap it. Give it a name if you like.</div></div></div>
+      <div class="tut-step"><span class="ts-emoji">3️⃣</span><div><div class="ts-title">Tap Add</div><div class="ts-desc">SUIKAVERSE now opens full-screen from your home screen — just like a real app!</div></div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeModal('veilInstall')">Got it! 🍉</button>
+    </div>
   </div>
 </div>
 
@@ -435,7 +457,7 @@
     <div class="modal-emoji">🍉</div>
     <h1>How to Play SUIKAVERSE</h1>
     <div class="tut-steps">
-      <div class="tut-step"><span class="ts-emoji">👆</span><div><div class="ts-title">Tap the watermelon</div><div class="ts-desc">Tap the big melon to harvest. Hold for auto-tap. Buy farms to earn while idle.</div></div></div>
+      <div class="tut-step"><span class="ts-emoji">👆</span><div><div class="ts-title">Tap the watermelon</div><div class="ts-desc">Tap the big melon to harvest. Buy farms to earn while idle.</div></div></div>
       <div class="tut-step"><span class="ts-emoji">🧺</span><div><div class="ts-title">Grow your farm</div><div class="ts-desc">Open the Farm tab and buy buildings. Upgrades double their output.</div></div></div>
       <div class="tut-step"><span class="ts-emoji">🕹️</span><div><div class="ts-title">Play mini games</div><div class="ts-desc">Suika (press Start to drop fruits), Whack-a-Melon and the Crystal Roulette.</div></div></div>
       <div class="tut-step"><span class="ts-emoji">🎯</span><div><div class="ts-title">Do quests</div><div class="ts-desc">Daily + story quests give crystals and XP. Open crates to fill your collection.</div></div></div>
@@ -445,13 +467,13 @@
     <div class="modal-actions">
       <button class="btn-primary" onclick="closeTutorial()">Got it! 🍉</button>
     </div>
-    <div class="modal-hint">Tip: hold to auto-tap, and press Start before dropping Suika fruits.</div>
+    <div class="modal-hint">Tip: tap the watermelon to harvest, and press Start before dropping Suika fruits.</div>
   </div>
 </div>
 
-<script src="game.js"></script>
-<script src="leaderboard.js"></script>
-<script src="chat.js"></script>
-<script src="suika.js"></script>
+<script src="game.js?v=20260811"></script>
+<script src="leaderboard.js?v=20260811"></script>
+<script src="chat.js?v=20260811"></script>
+<script src="suika.js?v=20260811"></script>
 </body>
 </html>
