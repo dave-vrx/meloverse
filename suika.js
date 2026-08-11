@@ -109,6 +109,7 @@
     playing = true;
     hideStartOverlay();
     ac();
+    if (window.scrollGameIntoView) setTimeout(function () { window.scrollGameIntoView(".suika-wrap"); }, 60);
   };
   window.suikaPause = function () {
     if (!started || gameOver) return;
@@ -152,11 +153,11 @@
     withCtx(nextCtx, function () {
       ctx.clearRect(0, 0, 100, 100);
       ctx.save();
-      ctx.translate(50, 51);
-      var pr = 14 + nextType * 4;
+      ctx.translate(50, 50);
+      var pr = 15 + nextType * 1.5;
       drawFruitShape(nextType, pr);
+      drawFace(0, 0, pr);
       ctx.restore();
-      drawFace(50, 51, pr);
     });
   }
 

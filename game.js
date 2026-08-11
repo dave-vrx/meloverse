@@ -49,7 +49,7 @@ const RANKS=[
 const ASC_UP=[
   {id:'as1', emoji:'🌱', name:'Golden Soil',    desc:'Each seed gives +1% MORE production (stacks)', max:5,  base:5,  mult:2.1},
   {id:'as2', emoji:'⚡', name:'Seed Surge',     desc:'+25% seeds gained per ascension',             max:5,  base:8,  mult:2.2},
-  {id:'as3', emoji:'💪', name:'Perpetual Growth', desc:'+100% ALL production (per level)',          max:10, base:25, mult:1.7},
+  {id:'as3', emoji:'💪', name:'Perpetual Growth', desc:'+50% ALL production (per level)',          max:10, base:25, mult:1.7},
   {id:'as4', emoji:'👆', name:'Titan Thumbs',   desc:'+50% tap power (per level)',                  max:10, base:15, mult:1.6},
   {id:'as5', emoji:'💤', name:'Dream Harvest',  desc:'+2× offline earnings (per level)',            max:5,  base:10, mult:2},
   {id:'as6', emoji:'🍀', name:'Golden Orchard', desc:'Golden melons appear 2× more often',          max:5,  base:12, mult:2},
@@ -63,7 +63,7 @@ const ASC_UP=[
 
 const SHOP=[
   {id:'sh1', emoji:'🤖', name:'Auto-Tapper Bot', desc:'+1 auto tap per second',             max:25, base:5,  mult:2.1},
-  {id:'sh2', emoji:'💎', name:'Mega Multiplier', desc:'+100% ALL production (per level)',   max:25, base:15, mult:2.4},
+  {id:'sh2', emoji:'💎', name:'Mega Multiplier', desc:'+50% ALL production (per level)',   max:25, base:15, mult:2.4},
   {id:'sh3', emoji:'⏳', name:'Time Warp Core',  desc:'+4h offline earning cap (per level)', max:6,  base:10, mult:2},
   {id:'sh4', emoji:'🍀', name:'Lucky Charm',     desc:'Golden melons 2× more often',        max:6,  base:8,  mult:2},
   {id:'sh5', emoji:'✨', name:'Golden Feast',    desc:'+50% golden melon rewards',          max:10, base:12, mult:1.8},
@@ -306,15 +306,15 @@ function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 
 /* ---------------- levels / xp ---------------- */
 
-function xpNeed(l){ return Math.floor(100*Math.pow(l,1.6)); }
-function levelMult(){ return 1+0.025*(G.save.level-1); }
+function xpNeed(l){ return Math.floor(120*Math.pow(l,1.8)); }
+function levelMult(){ return 1+0.01*(G.save.level-1); }
 function gainXp(n){
   if(!(n>0)) return;
   G.save.xp+=n;
   while(G.save.xp>=xpNeed(G.save.level)){
     G.save.xp-=xpNeed(G.save.level);
     G.save.level++;
-    const rew=2+G.save.level;
+    const rew=1+Math.floor(G.save.level/2);
     addCrystals(rew);
     toast('LEVEL UP! Now Level '+G.save.level+'! +'+rew+' 💎','🎉');
     beepAch();
@@ -331,7 +331,7 @@ function owned(id){ return G.save.upgrades.includes(id); }
 function level(id){ return G.save.asc[id]||0; }
 function shopLvl(id){ return G.save.shop[id]||0; }
 function totalBuildings(){ return BUILDINGS.reduce((s,b)=>s+(G.save.buildings[b.id]||0),0); }
-function buildingCost(b,ownedN,n){ return b.cost*Math.pow(1.15,ownedN)*(Math.pow(1.15,n)-1)/0.15; }
+function buildingCost(b,ownedN,n){ return b.cost*Math.pow(1.17,ownedN)*(Math.pow(1.17,n)-1)/0.17; }
 function buildingRate(b){ return b.rate*(owned('b_'+b.id+'_10')?2:1)*(owned('b_'+b.id+'_50')?2:1); }
 
 function perSecRaw(){
@@ -347,8 +347,8 @@ function clickBase(){
 function globalMult(){
   let m=1;
   for(const u of UPGRADES) if(u.kind==='global'&&owned(u.id)) m*=u.mult;
-  m*=Math.pow(2,level('as3'));
-  m*=Math.pow(2,shopLvl('sh2'));
+  m*=Math.pow(1.5,level('as3'));
+  m*=Math.pow(1.5,shopLvl('sh2'));
   m*=levelMult();
   return m;
 }
@@ -371,7 +371,7 @@ function autoPerSec(){ return (shopLvl('sh1')+level('as8'))*clickPower(); }
 function frenzyMult(){ return (Date.now()<G.frenzyUntil)?7:1; }
 function eventProdMult(){ return (G.evt&&(G.evt.id==='meteor'||G.evt.id==='turbo'))?2:1; }
 function effectivePerSec(){ return perSecRaw()*globalMult()*seedMult()*frenzyMult()*eventProdMult()+autoPerSec(); }
-function calcSeedGain(){ return Math.floor(Math.pow(G.save.runEarned/1e6,0.55)*(1+0.25*level('as2'))); }
+function calcSeedGain(){ return Math.floor(Math.pow(G.save.runEarned/1e7,0.45)*(1+0.25*level('as2'))); }
 function rankInfo(){
   let i=0;
   for(let r=0;r<RANKS.length;r++) if(G.save.lifetimeEarned>=RANKS[r][0]) i=r;
@@ -472,7 +472,15 @@ function setView(v){
   if(v==='grow') updateEventBanner();
   if(v!=='mini'&&typeof window.suikaPause==='function') window.suikaPause();
   window.scrollTo(0,0);
+  const m=document.querySelector('main'); if(m) m.scrollTop=0;
 }
+function scrollGameIntoView(sel,pad){
+  const m=document.querySelector('main'); if(!m) return;
+  const el=document.querySelector(sel); if(!el) return;
+  const top=el.getBoundingClientRect().top-m.getBoundingClientRect().top+m.scrollTop;
+  m.scrollTo({top:Math.max(0,top-(pad||10)),behavior:'smooth'});
+}
+window.scrollGameIntoView=scrollGameIntoView;
 function switchGrowTab(t){
   document.querySelectorAll('#growTabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   ['farm','upgrades','ascend','shop'].forEach(x=>$('tab-'+x).classList.toggle('on',x===t));
@@ -480,6 +488,7 @@ function switchGrowTab(t){
 function switchMiniTab(m){
   document.querySelectorAll('#miniTabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   ['suika','whack','roulette'].forEach(x=>$('mini-'+x).classList.toggle('on',x===m));
+  if(m==='roulette') setTimeout(layoutRoulette,50);
 }
 
 function refreshHud(){
@@ -605,7 +614,7 @@ function buyAsc(id){
 }
 function openAscendConfirm(){
   const gain=calcSeedGain();
-  if(gain<1){ toast('Keep growing! ~1M melons this run unlocks ascension.','🌱'); return; }
+  if(gain<1){ toast('Keep growing! ~10M melons this run unlocks ascension.','🌱'); return; }
   $('ascGainN').textContent=fmt(gain);
   openModal('veilAscend');
 }
@@ -637,7 +646,7 @@ function renderShop(){
     const can=!maxed&&G.save.crystals>=cost;
     let desc=s.desc;
     if(s.id==='sh1') desc='+'+lv+' auto taps/sec';
-    if(s.id==='sh2') desc='+'+lv+' ×2 production (×'+fmt(Math.pow(2,lv))+')';
+    if(s.id==='sh2') desc='+'+lv+' ×1.5 production (×'+fmt(Math.pow(1.5,lv))+')';
     if(s.id==='sh3') desc='+'+(lv*4)+'h offline cap';
     if(s.id==='sh4') desc='golden melons ×'+fmt(Math.pow(2,lv))+' more often';
     if(s.id==='sh5') desc='+'+Math.round(lv*50)+'% golden rewards';
@@ -765,8 +774,8 @@ function rollDailyQuests(){
 function claimDaily(){
   if(G.save.dailyClaimed) return;
   G.save.lastDaily=new Date().toDateString(); G.save.dailyClaimed=true;
-  const c=Math.min(4+G.save.dailyStreak,25);
-  addCrystals(c); gainXp(25);
+  const c=Math.min(3+G.save.dailyStreak,15);
+  addCrystals(c); gainXp(15);
   $('dailyMsg').innerHTML='<b>Day '+G.save.dailyStreak+'</b> streak!<br>You earned <b>+'+c+' 💎</b> crystals!';
   openModal('veilDaily');
   toast('+'+c+' 💎 daily reward!','🎁');
@@ -776,7 +785,7 @@ function claimDaily(){
 function checkOffline(){
   const dt=(Date.now()-G.save.lastOnline)/1000;
   if(dt>120){
-    const cap=(8+4*shopLvl('sh3'))*3600;
+    const cap=(6+3*shopLvl('sh3'))*3600;
     const offSec=Math.min(dt,cap);
     const earned=effectivePerSec()*offSec*Math.pow(2,level('as5'))*(1+0.25*level('as11'));
     addMelons(earned);
@@ -825,7 +834,7 @@ function renderQuestTab(){
           '<div class="q-desc">'+q.t+' <b>'+fmt(Math.min(p,q.goal))+'/'+fmt(q.goal)+'</b>'+q.unit+'</div>'+
           '<div class="q-bar"><div style="width:'+pct+'%"></div></div></div>'+
           (claim?'<button class="q-claim-btn" onclick="claimDailyQuest(\''+q.id+'\')">CLAIM</button>':
-          '<div class="q-reward">+2 💎<br>+30 xp</div>')+'</div>';
+          '<div class="q-reward">+1 💎<br>+20 xp</div>')+'</div>';
       });
       dw.innerHTML=html;
     }else dw.innerHTML='<div class="lb-empty">Daily quests roll at midnight 🌙</div>';
@@ -852,8 +861,8 @@ function claimQuest(id){
 }
 function claimDailyQuest(id){
   const q=DQ.find(x=>x.id===id); if(!q||G.save.dqDone.includes(id)||dqProgress(id)<q.goal) return;
-  G.save.dqDone.push(id); addCrystals(2); gainXp(30);
-  toast(q.n+' complete! +2 💎','🗓️');
+  G.save.dqDone.push(id); addCrystals(1); gainXp(20);
+  toast(q.n+' complete! +1 💎','🗓️');
   beepAch(); renderQuestTab(); refreshHud();
   Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
 }
@@ -886,18 +895,18 @@ function clickGolden(){
   const cryEvt=(G.evt&&G.evt.id==='crystal');
   const r=Math.random(); let msg='';
   if(r<0.30){
-    const amt=777*per*val; addMelons(amt); msg='🍀 LUCKY! +'+fmt(amt)+' melons!';
+    const amt=150*per*val; addMelons(amt); msg='🍀 LUCKY! +'+fmt(amt)+' melons!';
   }else if(r<0.52){
     G.frenzyUntil=Date.now()+30000; msg='⚡ FRENZY! ×7 production for 30s!';
   }else if(r<0.70){
-    const c=Math.max(1,Math.round(val*(1+Math.random()*4)))+(cryEvt?3:0);
+    const c=Math.max(1,Math.round(val*(1+Math.random()*2)))+(cryEvt?2:0);
     addCrystals(c); msg='🎁 JACKPOT! +'+c+' 💎!';
   }else if(r<0.85){
     G.tapUntil=Date.now()+30000; msg='👆 TAP STORM! ×10 tap power!';
   }else{
-    const amt=per*3600*val; addMelons(amt); msg='🕐 TIME WARP! +1h of growth ('+fmt(amt)+')!';
+    const amt=per*1800*val; addMelons(amt); msg='🕐 TIME WARP! +30min of growth ('+fmt(amt)+')!';
   }
-  if(cryEvt) addCrystals(1+Math.floor(Math.random()*3));
+  if(cryEvt) addCrystals(1);
   if(Math.random()<0.25){ dropCrate(1); }
   const gp=document.createElement('div'); gp.className='golden-pop'; gp.textContent='🍈';
   gp.style.left=(el.offsetLeft+24)+'px'; gp.style.top=(el.offsetTop+12)+'px';
@@ -981,11 +990,11 @@ window.suikaIdleFinish=function(score,stats){
   const boost=G.save.suika.suikaBoost?2:1;
   G.save.suika.suikaBoost=false;
   const mult=miniRewardMult()*boost;
-  const m=Math.floor(score*25*mult);
-  addMelons(m); gainXp(Math.floor(score/2*mult));
+  const m=Math.floor(score*12*mult);
+  addMelons(m); gainXp(Math.floor(score/3*mult));
   let cry=0;
-  if(score>=2000) cry+=5;
-  if(stats.watermelons>0) cry+=25*stats.watermelons;
+  if(score>=2000) cry+=3;
+  if(stats.watermelons>0) cry+=12*stats.watermelons;
   let drops=0;
   if(stats.watermelons>0){ dropCrate(stats.watermelons); drops+=stats.watermelons; }
   if(score>=1000){ dropCrate(1); drops++; }
@@ -999,8 +1008,8 @@ function whackFinish(score){
   G.save.whack.games++;
   if(score>G.save.whack.best) G.save.whack.best=score;
   const mult=miniRewardMult();
-  const m=Math.floor(score*10*mult);
-  addMelons(m); gainXp(Math.floor(score/3*mult));
+  const m=Math.floor(score*5*mult);
+  addMelons(m); gainXp(Math.floor(score/4*mult));
   if(score>=100) dropCrate(1);
   toast('Whack run: +'+fmt(m)+' melons!','🔨');
   refreshHud(); checkAchievements(); checkQuests(true);
@@ -1025,14 +1034,35 @@ function initRoulette(){
   const wheel=$('rouletteWheel');
   if(!wheel) return;
   const n=ROULETTE_SEGS.length, step=360/n;
-  let con=[];
-  ROULETTE_SEGS.forEach((s,i)=>{
-    const c=i%2?['#2f8f3a','#17602a']:['#3fce6a','#1f8f46'];
-    con.push(s.l+' '+(i*step)+'deg '+((i+1)*step)+'deg');
-  });
-  wheel.style.background='conic-gradient('+con.join(',')+')';
+  const colors=['#3fce6a','#1f8f46','#17602a'];
+  const con=[];
+  for(let i=0;i<n;i++){
+    con.push(colors[i%2]+' '+(i*step)+'deg '+((i+1)*step)+'deg');
+  }
+  wheel.style.background='conic-gradient(from 0deg, '+con.join(',')+')';
   wheel.style.setProperty('--segs',n);
+  wheel.querySelectorAll('.roulette-seg').forEach(x=>x.remove());
+  ROULETTE_SEGS.forEach(s=>{
+    const el=document.createElement('span');
+    el.className='roulette-seg';
+    el.textContent=s.l;
+    wheel.appendChild(el);
+  });
+  layoutRoulette();
+  addEventListener('resize',()=>{ if(document.body.dataset.view==='mini') layoutRoulette(); });
   updateRouletteUI();
+}
+function layoutRoulette(){
+  const wheel=$('rouletteWheel'); if(!wheel) return;
+  const n=ROULETTE_SEGS.length, step=360/n;
+  const half=wheel.clientWidth/2;
+  const r=half-24;
+  const segs=wheel.querySelectorAll('.roulette-seg');
+  segs.forEach((el,i)=>{
+    const rad=((i*step)+step/2-90)*Math.PI/180;
+    el.style.left=(half+Math.cos(rad)*r)+'px';
+    el.style.top=(half+Math.sin(rad)*r)+'px';
+  });
 }
 function spinRoulette(){
   if(rouletteBusy) return;
@@ -1047,9 +1077,11 @@ function spinRoulette(){
   rouletteRotation+=360*6+(360-(idx*step+step/2));
   const wheel=$('rouletteWheel');
   wheel.style.transform='rotate('+rouletteRotation+'deg)';
+  wheel.classList.add('spinning');
   $('rouletteResult').textContent='Spinning…';
   $('rouletteSpin').disabled=true;
   setTimeout(()=>{
+    wheel.classList.remove('spinning');
     if(seg.boost){ G.save.suika.suikaBoost=true; $('rouletteResult').textContent='🍉 Suika Boost! Next run ×2!'; toast('Suika Boost! Next run ×2!','🍉'); }
     else if(seg.pay>0){
       addCrystals(seg.pay); G.save.roulette.wins++;
@@ -1268,6 +1300,7 @@ function initWhack(){
     if(whackRun) return;
     whackRun=true; whackScore=0; whackEnd=Date.now()+15000;
     $('whackScore').textContent='0'; $('whackStart').textContent='GO!';
+    if(window.scrollGameIntoView) window.scrollGameIntoView('.whack-grid');
     whackInterval=setInterval(whackSpawn,620);
     whackTimer=setInterval(()=>{
       const left=Math.max(0,Math.ceil((whackEnd-Date.now())/1000));
@@ -1354,8 +1387,8 @@ function bossDead(){
   const b=G.save.boss;
   G.save.bossKills=(G.save.bossKills||0)+1;
   bossActive=false;
-  const cry=Math.max(1,Math.floor(b.tier*(2.5+level('as9')*0.5)*(1+shopLvl('sh8')*0.25)));
-  addCrystals(cry); gainXp(20+b.tier*5);
+  const cry=Math.max(1,Math.floor(b.tier*(2+level('as9')*0.4)*(1+shopLvl('sh8')*0.2)));
+  addCrystals(cry); gainXp(15+b.tier*3);
   const drops=Math.floor(1+b.tier*0.5);
   dropCrate(drops);
   toast('Boss defeated! +'+cry+' 💎 +'+drops+' 📦!','👑');

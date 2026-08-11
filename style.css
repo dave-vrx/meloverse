@@ -22,6 +22,7 @@
   --stem:#3f8f3f;
   --radius:16px;
   --sb-h:52px;
+  --tb-h:calc(66px + env(safe-area-inset-top));
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 html{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
@@ -62,27 +63,28 @@ body.skin-cosmic{--r1:#ff9de8;--r2:#c43dd6;--r3:#4a0f8a;--s1:#ffd24a;--s2:#2a044
 
 /* ---------------- top bar ---------------- */
 #topbar{
-  position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
-  gap:6px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;
-  background:rgba(7,19,12,.88);backdrop-filter:blur(14px);
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:calc(4px + env(safe-area-inset-top)) 8px 5px;
+  background:rgba(7,19,12,.9);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);
 }
-.logo{display:flex;align-items:center;gap:3px;font-family:'Baloo 2',cursive;font-size:1.15rem;cursor:pointer;white-space:nowrap;min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}
+.logo{display:flex;align-items:center;justify-content:center;gap:3px;font-family:'Baloo 2',cursive;font-size:1.08rem;cursor:pointer;white-space:nowrap;max-width:100%}
 .logo span{color:var(--txt)}
 .logo b{color:var(--acc);font-size:.95rem}
-.logo em{font-style:normal;font-size:.58rem;color:var(--dim);margin-left:3px;letter-spacing:.4px;display:none}
-.hud{display:flex;gap:5px;align-items:center;min-width:0;flex:0 1 auto;justify-content:flex-end;overflow:hidden}
+.logo em{font-style:normal;font-size:.56rem;color:var(--dim);margin-left:3px;letter-spacing:.4px;display:none}
+.hud{display:flex;gap:5px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%;min-width:0}
 .chip{
-  display:flex;align-items:center;gap:4px;padding:5px 8px;border-radius:999px;
-  background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.72rem;
+  display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;
+  background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.7rem;
   transition:transform .1s;white-space:nowrap;min-width:0;
 }
 .chip:active{transform:scale(.94)}
-.chip .chip-emoji{font-size:.85rem}
-.chip.name-chip{background:linear-gradient(135deg,rgba(94,224,138,.2),rgba(94,224,138,.05));max-width:42vw;flex-shrink:1}
-.chip.name-chip #hudName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px}
-.chip.icon-only{padding:5px 8px;font-size:.88rem;flex-shrink:0}
-.lv-pill{background:var(--acc-dark);color:#fff;border-radius:999px;padding:1px 6px;font-size:.6rem;margin-left:1px;flex-shrink:0}
+.chip .chip-emoji{font-size:.82rem}
+.chip.name-chip{background:linear-gradient(135deg,rgba(94,224,138,.2),rgba(94,224,138,.05));max-width:40vw}
+.chip.name-chip #hudName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:78px}
+.chip.icon-only{padding:4px 8px;font-size:.84rem;flex-shrink:0}
+.lv-pill{background:var(--acc-dark);color:#fff;border-radius:999px;padding:1px 6px;font-size:.58rem;margin-left:1px;flex-shrink:0}
 #hudCrateN{font-variant-numeric:tabular-nums}
 
 /* ---------------- layout (app shell) ---------------- */
@@ -92,7 +94,7 @@ main{
   max-width:760px;margin:0 auto;
   padding:14px 12px 28px;
 }
-.view{display:none;animation:fadeIn .25s ease}
+.view{display:none;animation:fadeIn .25s ease;min-height:100%}
 body[data-view=grow] #view-grow,
 body[data-view=mini] #view-mini,
 body[data-view=quests] #view-quests,
@@ -310,6 +312,12 @@ body[data-view=more] #view-more{display:block}
   padding:11px 20px;border-radius:12px;font-size:.88rem;box-shadow:0 4px 18px rgba(94,224,138,.35);
 }
 .btn-primary:active{transform:scale(.96)}
+.btn-danger{
+  background:linear-gradient(135deg,var(--danger),#b3263a);color:#fff;font-weight:900;
+  padding:11px 20px;border-radius:12px;font-size:.82rem;box-shadow:0 4px 18px rgba(255,93,108,.3);
+}
+.btn-danger:active{transform:scale(.96)}
+.reset-note{color:var(--dim);font-size:.7rem;margin-top:8px;line-height:1.4}
 
 /* ---------------- mini games ---------------- */
 .mini{display:none}
@@ -319,8 +327,9 @@ body[data-view=more] #view-more{display:block}
 .sstat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center}
 .sstat span{display:block;color:var(--dim);font-size:.6rem;font-weight:800}
 .sstat b{font-family:'Baloo 2',cursive;font-size:1.05rem}
-.sstat-next{flex:0 0 92px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.next-bubble{width:56px;height:56px;display:block}
+.sstat-next{flex:0 0 96px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.next-bubble{width:62px;height:62px;display:block;margin-top:2px;overflow:hidden;border-radius:50%;background:rgba(0,0,0,.25)}
+.next-bubble canvas{width:100%;height:100%;display:block}
 .suika-wrap{
   position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);
   box-shadow:0 10px 40px rgba(0,0,0,.5);
@@ -362,6 +371,12 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
   position:relative;width:min(78vw,300px);aspect-ratio:1;margin:0 auto;border-radius:50%;
   border:8px solid var(--acc-dark);box-shadow:0 0 40px rgba(94,224,138,.25),inset 0 0 30px rgba(0,0,0,.4);
   transition:transform 3.2s cubic-bezier(.17,.67,.12,.99);
+}
+.roulette-wheel.spinning{box-shadow:0 0 60px rgba(94,224,138,.5),inset 0 0 30px rgba(0,0,0,.4)}
+.roulette-seg{
+  position:absolute;transform:translate(-50%,-50%);
+  font-weight:900;font-size:.8rem;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);
+  pointer-events:none;white-space:nowrap;
 }
 .wheel-arrow{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:1.5rem;z-index:5;filter:drop-shadow(0 2px 4px #000)}
 .roulette-result{margin:14px 0;font-weight:900;font-size:1.05rem;min-height:1.4em}
@@ -443,7 +458,7 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
 #rouletteSpin:disabled{opacity:.45;filter:grayscale(.5);cursor:default}
 
 /* ---------------- toasts / fx ---------------- */
-#toasts{position:fixed;top:calc(var(--sb-h) + 10px);left:0;right:0;z-index:60;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+#toasts{position:fixed;top:calc(var(--tb-h,66px) + 6px);left:0;right:0;z-index:60;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
 .toast{
   display:flex;align-items:center;gap:7px;background:rgba(10,26,16,.94);border:1px solid var(--acc);
   color:var(--txt);font-weight:800;font-size:.8rem;padding:9px 16px;border-radius:999px;
@@ -520,17 +535,17 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
   .logo b{font-size:.82rem}
   .logo em{display:none}
   .hud{gap:4px}
-  .chip{padding:4px 7px;font-size:.68rem}
-  .chip .chip-emoji{font-size:.8rem}
-  .chip.icon-only{padding:4px 7px}
-  .lv-pill{font-size:.55rem;padding:1px 5px}
-  .chip.name-chip #hudName{max-width:54px}
+  .chip{padding:3px 7px;font-size:.66rem}
+  .chip .chip-emoji{font-size:.78rem}
+  .chip.icon-only{padding:3px 7px}
+  .lv-pill{font-size:.54rem;padding:1px 5px}
+  .chip.name-chip #hudName{max-width:56px}
   .big-number{font-size:2.1rem}
   .sstat b{font-size:.95rem}
 }
 @media(max-width:350px){
   #hudSeeds{display:none}
   #hudCrates{display:none}
-  .logo{font-size:.9rem}
+  .logo{font-size:.92rem}
   .logo b{font-size:.78rem}
 }

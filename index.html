@@ -37,6 +37,7 @@
       <span class="chip-emoji">📦</span><span id="hudCrateN">0</span>
     </button>
     <button class="chip icon-only" id="btnSound" onclick="toggleSound()" title="Sound">🔊</button>
+    <button class="chip icon-only" id="btnSettings" onclick="setView('more')" title="Settings">⚙️</button>
   </div>
 </header>
 
@@ -264,6 +265,12 @@
     </div>
     <div class="scroll-area lb-list" id="lbList">
       <div class="lb-empty">Loading galaxy… 🌌</div>
+    </div>
+    <div class="quest-block">
+      <h3>⚙️ Settings</h3>
+      <p class="quest-hint">Start fresh: wipe all progress on this device <b>and</b> remove your score from the global leaderboard.</p>
+      <button class="btn-danger" onclick="resetGame()">🗑️ Reset All &amp; Clear My Score</button>
+      <div class="reset-note">Crystals, farms, quests, collection and your leaderboard entry are removed — you'll begin as a brand-new farmer.</div>
     </div>
   </section>
 
