@@ -1019,6 +1019,25 @@
       ctx.fillText("CHAIN x" + chain, W / 2, 8);
     }
 
+    if (playing && !gameOver) {
+      var nbx = W - 40, nby = 50;
+      ctx.fillStyle = "rgba(5,14,9,0.66)";
+      ctx.beginPath();
+      ctx.arc(nbx, nby, 27, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(142,240,160,0.7)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(nbx, nby, 27, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = "#ffe066";
+      ctx.font = "800 11px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText("NEXT", nbx, nby - 28);
+      drawFruit(nbx, nby + 2, nextType, 21 / FRUITS[nextType].r, 0);
+    }
+
     ctx.restore();
   }
 
