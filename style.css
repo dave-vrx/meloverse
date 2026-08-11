@@ -69,22 +69,22 @@ body.skin-cosmic{--r1:#ff9de8;--r2:#c43dd6;--r3:#4a0f8a;--s1:#ffd24a;--s2:#2a044
   background:rgba(7,19,12,.9);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);
 }
-.logo{display:flex;align-items:center;justify-content:center;gap:3px;font-family:'Baloo 2',cursive;font-size:1.08rem;cursor:pointer;white-space:nowrap;max-width:100%}
+.logo{display:flex;align-items:center;justify-content:center;gap:3px;font-family:'Baloo 2',cursive;font-size:1.15rem;cursor:pointer;white-space:nowrap;max-width:100%}
 .logo span{color:var(--txt)}
 .logo b{color:var(--acc);font-size:.95rem}
-.logo em{font-style:normal;font-size:.56rem;color:var(--dim);margin-left:3px;letter-spacing:.4px;display:none}
+.logo em{font-style:normal;font-size:.58rem;color:var(--dim);margin-left:3px;letter-spacing:.4px;display:none}
 .hud{display:flex;gap:5px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%;min-width:0}
 .chip{
   display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;
-  background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.7rem;
+  background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.72rem;
   transition:transform .1s;white-space:nowrap;min-width:0;
 }
 .chip:active{transform:scale(.94)}
-.chip .chip-emoji{font-size:.82rem}
+.chip .chip-emoji{font-size:.85rem}
 .chip.name-chip{background:linear-gradient(135deg,rgba(94,224,138,.2),rgba(94,224,138,.05));max-width:40vw}
 .chip.name-chip #hudName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:78px}
-.chip.icon-only{padding:4px 8px;font-size:.84rem;flex-shrink:0}
-.lv-pill{background:var(--acc-dark);color:#fff;border-radius:999px;padding:1px 6px;font-size:.58rem;margin-left:1px;flex-shrink:0}
+.chip.icon-only{padding:4px 8px;font-size:.88rem;flex-shrink:0}
+.lv-pill{background:var(--acc-dark);color:#fff;border-radius:999px;padding:1px 6px;font-size:.6rem;margin-left:1px;flex-shrink:0}
 #hudCrateN{font-variant-numeric:tabular-nums}
 
 /* ---------------- layout (app shell) ---------------- */
@@ -444,7 +444,7 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
 #bossEmoji{font-size:2.6rem;line-height:1}
 #bossName{font-weight:900;font-size:.72rem;letter-spacing:.5px}
 #bossHPBar{width:200px;max-width:62vw;height:9px;border-radius:99px;background:rgba(0,0,0,.45);overflow:hidden;border:1px solid rgba(255,255,255,.25)}
-#bossHP{height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#ff5d6c,#ffd24a);transition:width .15s}
+#bossHP{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#ff5d6c,#ffd24a);transition:width .15s}
 #bossTimer{font-weight:900;font-size:.62rem;color:#ffe08a}
 
 /* ---------------- suika start overlay ---------------- */
@@ -535,17 +535,17 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
   .logo b{font-size:.82rem}
   .logo em{display:none}
   .hud{gap:4px}
-  .chip{padding:3px 7px;font-size:.66rem}
-  .chip .chip-emoji{font-size:.78rem}
-  .chip.icon-only{padding:3px 7px}
-  .lv-pill{font-size:.54rem;padding:1px 5px}
-  .chip.name-chip #hudName{max-width:56px}
+  .chip{padding:4px 7px;font-size:.68rem}
+  .chip .chip-emoji{font-size:.8rem}
+  .chip.icon-only{padding:4px 7px}
+  .lv-pill{font-size:.55rem;padding:1px 5px}
+  .chip.name-chip #hudName{max-width:54px}
   .big-number{font-size:2.1rem}
   .sstat b{font-size:.95rem}
 }
 @media(max-width:350px){
   #hudSeeds{display:none}
   #hudCrates{display:none}
-  .logo{font-size:.92rem}
+  .logo{font-size:.9rem}
   .logo b{font-size:.78rem}
 }
