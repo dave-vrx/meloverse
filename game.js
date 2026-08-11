@@ -1142,10 +1142,11 @@ function submitName(){
   if(booted){ if(typeof Leaderboard!=='undefined') Leaderboard.onNameChange(); if(typeof Chat!=='undefined') Chat.onOpen(); }
   else postBoot();
 }
-function resetGame(){
-  if(confirm('Reset ALL progress and remove your leaderboard entry?')){
-    localStorage.removeItem('suikaver_save'); localStorage.removeItem('meloverse_save'); location.reload();
-  }
+async function resetGame(){
+  if(!confirm('Reset ALL progress and remove your leaderboard entry?')) return;
+  try{ if(typeof Leaderboard!=='undefined'&&Leaderboard.removeMe) await Leaderboard.removeMe(); }catch(e){}
+  localStorage.removeItem('suikaver_save'); localStorage.removeItem('meloverse_save');
+  location.reload();
 }
 
 let booted=false;

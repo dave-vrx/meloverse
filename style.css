@@ -67,21 +67,21 @@ body.skin-cosmic{--r1:#ff9de8;--r2:#c43dd6;--r3:#4a0f8a;--s1:#ffd24a;--s2:#2a044
   background:rgba(7,19,12,.88);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);
 }
-.logo{display:flex;align-items:center;gap:3px;font-family:'Baloo 2',cursive;font-size:1.15rem;cursor:pointer;white-space:nowrap;min-width:0}
+.logo{display:flex;align-items:center;gap:3px;font-family:'Baloo 2',cursive;font-size:1.15rem;cursor:pointer;white-space:nowrap;min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}
 .logo span{color:var(--txt)}
 .logo b{color:var(--acc);font-size:.95rem}
 .logo em{font-style:normal;font-size:.58rem;color:var(--dim);margin-left:3px;letter-spacing:.4px;display:none}
-.hud{display:flex;gap:5px;align-items:center;min-width:0;flex-shrink:1;justify-content:flex-end}
+.hud{display:flex;gap:5px;align-items:center;min-width:0;flex:0 1 auto;justify-content:flex-end;overflow:hidden}
 .chip{
   display:flex;align-items:center;gap:4px;padding:5px 8px;border-radius:999px;
   background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.72rem;
-  transition:transform .1s;white-space:nowrap;
+  transition:transform .1s;white-space:nowrap;min-width:0;
 }
 .chip:active{transform:scale(.94)}
 .chip .chip-emoji{font-size:.85rem}
-.chip.name-chip{background:linear-gradient(135deg,rgba(94,224,138,.2),rgba(94,224,138,.05));max-width:46vw}
-.chip.name-chip #hudName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:88px}
-.chip.icon-only{padding:5px 8px;font-size:.88rem}
+.chip.name-chip{background:linear-gradient(135deg,rgba(94,224,138,.2),rgba(94,224,138,.05));max-width:42vw;flex-shrink:1}
+.chip.name-chip #hudName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px}
+.chip.icon-only{padding:5px 8px;font-size:.88rem;flex-shrink:0}
 .lv-pill{background:var(--acc-dark);color:#fff;border-radius:999px;padding:1px 6px;font-size:.6rem;margin-left:1px;flex-shrink:0}
 #hudCrateN{font-variant-numeric:tabular-nums}
 
@@ -516,17 +516,21 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
 
 /* ---------------- ultra-narrow phones ---------------- */
 @media(max-width:420px){
-  .logo{font-size:1rem}
-  .logo b{font-size:.85rem}
+  .logo{font-size:.98rem}
+  .logo b{font-size:.82rem}
   .logo em{display:none}
+  .hud{gap:4px}
   .chip{padding:4px 7px;font-size:.68rem}
   .chip .chip-emoji{font-size:.8rem}
   .chip.icon-only{padding:4px 7px}
   .lv-pill{font-size:.55rem;padding:1px 5px}
-  .chip.name-chip #hudName{max-width:58px}
+  .chip.name-chip #hudName{max-width:54px}
   .big-number{font-size:2.1rem}
   .sstat b{font-size:.95rem}
 }
 @media(max-width:350px){
   #hudSeeds{display:none}
+  #hudCrates{display:none}
+  .logo{font-size:.9rem}
+  .logo b{font-size:.78rem}
 }

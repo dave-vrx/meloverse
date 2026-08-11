@@ -101,6 +101,25 @@ const Leaderboard = (()=>{
 
   function onNameChange(){ lastSubmitValue=-1; submit(true); }
 
+  async function removeMe(){
+    try{
+      const id=G.save.playerId||myId;
+      const r=await fetch(URL,{cache:'no-store'});
+      if(!r.ok) return;
+      const data=await r.json();
+      const arr=(data&&Array.isArray(data.scores))?data.scores:[];
+      const filtered=arr.filter(s=>s.id!==id);
+      if(filtered.length<arr.length){
+        await fetch(URL,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({scores:filtered,updated:Date.now()})
+        });
+        scores=filtered;
+      }
+    }catch(e){}
+  }
+
   function render(){
     const list=document.getElementById('lbList');
     if(!list) return;
@@ -139,5 +158,5 @@ const Leaderboard = (()=>{
     setInterval(()=>{ if(typeof G!=='undefined'&&G.save) submit(false); },20000);
   }
 
-  return {init,refresh,submit,bump,throttledSubmit,onNameChange,render};
+  return {init,refresh,submit,bump,throttledSubmit,onNameChange,render,removeMe};
 })();
