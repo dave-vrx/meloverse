@@ -76,7 +76,8 @@
   var nextType = randomRank();
   var dropLocked = false;
   var dropLockedAt = 0;
-  var playing = true;
+  var started = false;
+  var playing = false;
   var gameOver = false;
   var chain = 0;
   var lastTime = null;
@@ -93,6 +94,32 @@
   var newBestEl = document.getElementById("suikaNewBest");
   var statsEl = document.getElementById("suikaStats");
   var restartBtn = document.getElementById("suikaRestart");
+  var startOverlay = document.getElementById("suikaStartOverlay");
+  var startBtn = document.getElementById("suikaStartBtn");
+
+  function showStartOverlay(resume) {
+    if (startBtn) startBtn.textContent = resume ? "▶ RESUME" : "▶ START GAME";
+    if (startOverlay) startOverlay.classList.remove("hidden");
+  }
+  function hideStartOverlay() {
+    if (startOverlay) startOverlay.classList.add("hidden");
+  }
+  window.suikaStart = function () {
+    started = true;
+    playing = true;
+    hideStartOverlay();
+    ac();
+  };
+  window.suikaPause = function () {
+    if (!started || gameOver) return;
+    playing = false;
+    showStartOverlay(true);
+  };
+  if (startBtn) startBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    window.suikaStart();
+  });
+  showStartOverlay(false);
 
   bestEl.textContent = best.toLocaleString();
   buildChainLegend();

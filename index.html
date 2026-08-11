@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#07130c">
 <meta name="description" content="SUIKAVERSE — the all-in-one watermelon multiverse. Idle farming, the full Suika merge game, mini games, quests, skins, chat and a live global leaderboard. Made by Dave-VR.">
 <title>SUIKAVERSE 🍉 | Watermelon Idle Multiverse</title>
@@ -147,6 +148,19 @@
       </div>
       <div class="suika-wrap">
         <canvas id="suikaCanvas" width="440" height="640"></canvas>
+        <div class="suika-overlay" id="suikaStartOverlay">
+          <div class="suika-card suika-start-card">
+            <div class="suika-start-emoji">🍉</div>
+            <h3>Ready to Stack?</h3>
+            <p>Drop fruits and merge two of the same to grow them!</p>
+            <div class="suika-start-list">
+              <div>💡 Tap <b>Start</b> when you're ready — no accidental drops.</div>
+              <div>🎯 Aim with your finger or mouse, release to drop.</div>
+              <div>⚔️ Merge to the <b>Watermelon 🍉</b> for legendary drops!</div>
+            </div>
+            <button class="btn-primary" id="suikaStartBtn">▶ Start Game</button>
+          </div>
+        </div>
         <div class="suika-overlay hidden" id="suikaOverlay">
           <div class="suika-card">
             <h3>Game Over!</h3>
@@ -179,7 +193,7 @@
           <div class="wheel-arrow"></div>
         </div>
         <div class="roulette-result" id="rouletteResult"></div>
-        <button class="btn-primary" id="rouletteSpin">🎡 Spin — 10 💎</button>
+        <button class="btn-primary" id="rouletteSpin" onclick="spinRoulette()">🎡 Spin — 10 💎</button>
         <p class="game-hint">Wheels of fortune! Win up to 100 💎 or boost your next Suika run. Your crystals balance updates live on the leaderboard.</p>
       </div>
     </div>
@@ -276,24 +290,34 @@
       <p>Everything you need to rule the watermelon multiverse.</p>
     </div>
 
+    <div class="quest-block">
+      <h3>🚀 Quick Tutorial</h3>
+      <button class="btn-primary" onclick="openTutorial()">📖 Show New-Player Tutorial</button>
+    </div>
+
     <div class="help-grid">
-      <div class="help-card"><span class="step-num">01</span><h3>Tap to harvest</h3><p>Tap the big watermelon to harvest melons. Tap power grows as you buy farms and upgrades.</p></div>
-      <div class="help-card"><span class="step-num">02</span><h3>Buy farms</h3><p>Farms produce melons every second — even while you're away. Double them with upgrades.</p></div>
-      <div class="help-card"><span class="step-num">03</span><h3>Prestige (⭐)</h3><p>Reach ~1M melons and Ascend to earn Seeds. Seeds permanently boost ALL production. Collect 10+ for powerful permanent upgrades.</p></div>
-      <div class="help-card"><span class="step-num">04</span><h3>Play Suika</h3><p>The classic watermelon-stacking game is built in! Every merge earns your empire melons. Chain combos, beat your best.</p></div>
-      <div class="help-card"><span class="step-num">05</span><h3>Quests &amp; drops</h3><p>Do quests for crystals &amp; XP. Clicks, buys and golden melons drop crates with rare collectibles. Fill your collection!</p></div>
-      <div class="help-card"><span class="step-num">06</span><h3>Level up</h3><p>Earn XP from everything. Every level = +2% production, +1% tap power and free crystals. Show it off on the board.</p></div>
-      <div class="help-card"><span class="step-num">07</span><h3>Skins &amp; currency</h3><p>Spend 💎 crystals on skins and boosts. Your live balance is shown on the leaderboard — buying updates it in real time.</p></div>
-      <div class="help-card"><span class="step-num">08</span><h3>Events</h3><p>Random global events hit the whole multiverse at once — Meteor Showers, Crystal Rains, Fruit Rushes and more. Catch them live!</p></div>
+      <div class="help-card"><span class="step-num">01</span><h3>Tap to harvest</h3><p>Tap the big watermelon to harvest melons. Tap power grows as you buy farms and upgrades. Hold to auto-tap!</p></div>
+      <div class="help-card"><span class="step-num">02</span><h3>Buy farms</h3><p>Farms produce melons every second — even while you're away. Buy ×1, ×10, ×25 or ×100 and double them with upgrades.</p></div>
+      <div class="help-card"><span class="step-num">03</span><h3>Prestige (⭐)</h3><p>Reach millions of melons and Ascend to earn Seeds. Seeds permanently boost ALL production. Use seeds for powerful permanent upgrades.</p></div>
+      <div class="help-card"><span class="step-num">04</span><h3>Play Suika</h3><p>The classic stacking game is built in! Press Start, drop matching fruits to merge them. Every merge earns your empire melons.</p></div>
+      <div class="help-card"><span class="step-num">05</span><h3>Whack-a-Melon</h3><p>Whack the melons that pop up before they vanish. Gold melons are worth ×5! Score becomes melons and drops.</p></div>
+      <div class="help-card"><span class="step-num">06</span><h3>Roulette</h3><p>Spin for crystals! Win up to 100 💎 or a ×2 Suika boost. Costs 10 💎 per spin (discounts reduce it).</p></div>
+      <div class="help-card"><span class="step-num">07</span><h3>Quests &amp; drops</h3><p>Do story + daily quests for crystals &amp; XP. Clicks, buys, golden melons and bosses drop crates with collectibles. Fill your collection!</p></div>
+      <div class="help-card"><span class="step-num">08</span><h3>Level up</h3><p>Earn XP from everything you do. Every level = more production, more tap power and free crystals.</p></div>
+      <div class="help-card"><span class="step-num">09</span><h3>Bosses 👹</h3><p>Every 45–80 minutes a Boss Watermelon attacks! Smash it fast for big crystal + crate rewards. Beat your own record!</p></div>
+      <div class="help-card"><span class="step-num">10</span><h3>Global events</h3><p>Random events hit the whole multiverse at once — Meteor Showers, Crystal Rains, Fruit Rushes and more. Tap the banner!</p></div>
+      <div class="help-card"><span class="step-num">11</span><h3>Golden melon</h3><p>A glowing golden melon appears randomly. Click it fast — it can be a Lucky Jackpot, Frenzy, Tap Storm or Time Warp!</p></div>
+      <div class="help-card"><span class="step-num">12</span><h3>Skins &amp; currency</h3><p>Spend 💎 crystals on skins and permanent shop boosts. Your live balance updates on the leaderboard in real time.</p></div>
     </div>
 
     <div class="view-head"><h2>❓ FAQ</h2></div>
     <div class="faq">
       <details><summary>How do I save my progress?</summary><p>Automatically — it's saved in your browser's local storage every few seconds. No account needed. Clear your browser data and it's gone.</p></details>
-      <details><summary>Where does the leaderboard live?</summary><p>Every player shares one free keyless cloud store (MantleDB), so the board is truly global and updates in real time. Give it a few seconds to sync.</p></details>
-      <details><summary>What are Seeds and Prestige?</summary><p>When you Ascend you convert your run's melons into Seeds. Each seed gives +1% permanent production (upgradeable to +10%). It's the core end-game loop.</p></details>
-      <details><summary>How do I get crystals 💎?</summary><p>Daily rewards, achievements, quests, golden melons, crates, roulette and Suika milestones. Spend them on skins, boosts and permanent shop upgrades.</p></details>
+      <details><summary>Where does the leaderboard live?</summary><p>Every player shares one free keyless cloud store (MantleDB), so the board is truly global and updates in real time. Your current melon score updates when you buy or spend.</p></details>
+      <details><summary>What are Seeds and Prestige?</summary><p>When you Ascend you convert your run's melons into Seeds. Each seed permanently boosts production. It's the core end-game loop.</p></details>
+      <details><summary>How do I get crystals 💎?</summary><p>Daily rewards, achievements, quests, golden melons, crates, roulette, bosses and Suika milestones. Spend them on skins, boosts and permanent shop upgrades.</p></details>
       <details><summary>How does the Suika mini game help my idle empire?</summary><p>Every fruit merge adds melons to your empire, big merges drop rare collectibles, and making a watermelon grants a legendary drop + crystals.</p></details>
+      <details><summary>What are the bosses?</summary><p>A Boss Watermelon attacks randomly every 45–80 minutes. Tap it to deal damage before the timer runs out. Defeat it for crystals, crates and XP.</p></details>
       <details><summary>What are the global events?</summary><p>Random timed events (Meteor Shower, Crystal Rain, Gold Rush, Fruit Rush, Turbo) affect the whole multiverse at once. Tap the banner when it appears.</p></details>
       <details><summary>I found a bug!</summary><p>Tell Dave-VR! This game is hand-built with love (and melons) and every report makes it better.</p></details>
     </div>
@@ -302,15 +326,19 @@
       <h3>⚙️ Settings</h3>
       <div class="settings-list">
         <button class="btn-ghost" onclick="toggleSound()">🔊 Toggle Sound</button>
+        <button class="btn-ghost" onclick="openTutorial()">📖 Replay Tutorial</button>
         <button class="btn-ghost" onclick="resetGame()">🗑️ Reset All Progress</button>
       </div>
     </div>
 
     <div class="about-box">
       <div class="about-brand">🍉 SUIKA<span>VERSE</span></div>
-      <p>The all-in-one watermelon multiverse: idle farming, Suika stacking, mini games, quests, collection, skins and a live global chat + leaderboard.</p>
+      <p>The all-in-one watermelon multiverse: idle farming, Suika stacking, mini games, quests, collection, bosses, skins and a live global chat + leaderboard.</p>
       <p>Made with 💚 by <b>Dave-VR</b> — not affiliated with any other game or its creators.</p>
     </div>
+
+    <footer id="footer">🍉 <b>SUIKA</b><b style="color:var(--acc)">VERSE</b> — watermelon idle multiverse &nbsp;·&nbsp; Made with 💚 by <b>Dave-VR</b></footer>
+
   </section>
 
 </main>
@@ -326,6 +354,16 @@
 
 <!-- Golden melon event -->
 <button id="goldenMelon" class="golden hidden" aria-label="Golden melon!">🍈</button>
+
+<!-- Boss fight -->
+<div id="bossWrap" class="hidden">
+  <button id="bossBtn" aria-label="Defeat the boss!">
+    <span id="bossEmoji">👹</span>
+    <span id="bossName">BOSS WATERMELON</span>
+    <span id="bossHPBar"><span id="bossHP"></span></span>
+    <span id="bossTimer">60s</span>
+  </button>
+</div>
 
 <div id="toasts"></div>
 
@@ -385,7 +423,24 @@
   </div>
 </div>
 
-<footer id="footer">🍉 <b>SUIKA</b><b style="color:var(--acc)">VERSE</b> — watermelon idle multiverse &nbsp;·&nbsp; Made with 💚 by <b>Dave-VR</b> &nbsp;·&nbsp; <a href="#" onclick="resetGame();return false;" style="color:inherit">Reset</a></footer>
+<div class="modal-veil hidden" id="veilTutorial">
+  <div class="modal">
+    <div class="modal-emoji">🍉</div>
+    <h1>How to Play SUIKAVERSE</h1>
+    <div class="tut-steps">
+      <div class="tut-step"><span class="ts-emoji">👆</span><div><div class="ts-title">Tap the watermelon</div><div class="ts-desc">Tap the big melon to harvest. Hold for auto-tap. Buy farms to earn while idle.</div></div></div>
+      <div class="tut-step"><span class="ts-emoji">🧺</span><div><div class="ts-title">Grow your farm</div><div class="ts-desc">Open the Farm tab and buy buildings. Upgrades double their output.</div></div></div>
+      <div class="tut-step"><span class="ts-emoji">🕹️</span><div><div class="ts-title">Play mini games</div><div class="ts-desc">Suika (press Start to drop fruits), Whack-a-Melon and the Crystal Roulette.</div></div></div>
+      <div class="tut-step"><span class="ts-emoji">🎯</span><div><div class="ts-title">Do quests</div><div class="ts-desc">Daily + story quests give crystals and XP. Open crates to fill your collection.</div></div></div>
+      <div class="tut-step"><span class="ts-emoji">⭐</span><div><div class="ts-title">Prestige</div><div class="ts-desc">Ascend to earn Seeds — permanent production boosts. Buy permanent upgrades with seeds.</div></div></div>
+      <div class="tut-step"><span class="ts-emoji">👹</span><div><div class="ts-title">Defeat bosses</div><div class="ts-desc">Every 45–80 min a boss attacks. Smash it fast for crystals and crates!</div></div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeTutorial()">Got it! 🍉</button>
+    </div>
+    <div class="modal-hint">Tip: hold to auto-tap, and press Start before dropping Suika fruits.</div>
+  </div>
+</div>
 
 <script src="game.js"></script>
 <script src="leaderboard.js"></script>

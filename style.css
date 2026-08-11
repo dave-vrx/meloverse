@@ -23,15 +23,16 @@
   --radius:16px;
   --sb-h:52px;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 html{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
 html,body{margin:0;padding:0;height:100%}
 body{
+  position:fixed;inset:0;width:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
   background:radial-gradient(1200px 800px at 70% -10%,#0d2a18 0%,var(--bg) 45%);
   color:var(--txt);
   font-family:'Nunito',system-ui,sans-serif;
-  overflow-x:hidden;
-  overscroll-behavior:none;
   touch-action:manipulation;
   -webkit-user-select:none;user-select:none;
 }
@@ -61,32 +62,35 @@ body.skin-cosmic{--r1:#ff9de8;--r2:#c43dd6;--r3:#4a0f8a;--s1:#ffd24a;--s2:#2a044
 
 /* ---------------- top bar ---------------- */
 #topbar{
-  position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
-  gap:8px;padding:8px 12px;
-  background:rgba(7,19,12,.82);backdrop-filter:blur(14px);
+  position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  gap:6px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;
+  background:rgba(7,19,12,.88);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);
 }
-.logo{display:flex;align-items:baseline;gap:4px;font-family:'Baloo 2',cursive;font-size:1.25rem;cursor:pointer;white-space:nowrap}
+.logo{display:flex;align-items:center;gap:3px;font-family:'Baloo 2',cursive;font-size:1.15rem;cursor:pointer;white-space:nowrap;min-width:0}
 .logo span{color:var(--txt)}
-.logo b{color:var(--acc);font-size:1.05rem}
-.logo em{font-style:normal;font-size:.6rem;color:var(--dim);margin-left:4px;letter-spacing:.4px}
-.hud{display:flex;gap:6px;align-items:center}
+.logo b{color:var(--acc);font-size:.95rem}
+.logo em{font-style:normal;font-size:.58rem;color:var(--dim);margin-left:3px;letter-spacing:.4px;display:none}
+.hud{display:flex;gap:5px;align-items:center;min-width:0;flex-shrink:1;justify-content:flex-end}
 .chip{
-  display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;
-  background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.78rem;
-  transition:transform .1s;
+  display:flex;align-items:center;gap:4px;padding:5px 8px;border-radius:999px;
+  background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.72rem;
+  transition:transform .1s;white-space:nowrap;
 }
 .chip:active{transform:scale(.94)}
-.chip .chip-emoji{font-size:.95rem}
-.chip.name-chip{background:linear-gradient(135deg,rgba(94,224,138,.2),rgba(94,224,138,.05))}
-.chip.icon-only{padding:6px 9px;font-size:.95rem}
-.lv-pill{background:var(--acc-dark);color:#fff;border-radius:999px;padding:1px 7px;font-size:.65rem;margin-left:2px}
+.chip .chip-emoji{font-size:.85rem}
+.chip.name-chip{background:linear-gradient(135deg,rgba(94,224,138,.2),rgba(94,224,138,.05));max-width:46vw}
+.chip.name-chip #hudName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:88px}
+.chip.icon-only{padding:5px 8px;font-size:.88rem}
+.lv-pill{background:var(--acc-dark);color:#fff;border-radius:999px;padding:1px 6px;font-size:.6rem;margin-left:1px;flex-shrink:0}
 #hudCrateN{font-variant-numeric:tabular-nums}
 
-/* ---------------- layout ---------------- */
+/* ---------------- layout (app shell) ---------------- */
 main{
-  max-width:640px;margin:0 auto;padding:14px 12px 96px;
-  min-height:calc(100vh - var(--sb-h));
+  position:fixed;top:var(--tb-h,52px);left:0;right:0;bottom:var(--sb-h);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  max-width:760px;margin:0 auto;
+  padding:14px 12px 28px;
 }
 .view{display:none;animation:fadeIn .25s ease}
 body[data-view=grow] #view-grow,
@@ -371,7 +375,7 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
 .chat-msg .cm-name{font-weight:900;font-size:.72rem}
 .chat-msg .cm-time{color:var(--dim);font-size:.58rem;margin-left:auto}
 .chat-msg .cm-text{font-size:.82rem;line-height:1.3;word-wrap:break-word}
-.chat-input-row{display:flex;gap:8px;position:sticky;bottom:calc(var(--sb-h) + 8px);}
+.chat-input-row{display:flex;gap:8px;position:sticky;bottom:8px;background:linear-gradient(180deg,rgba(7,19,12,0),var(--bg) 30%);padding-top:8px}
 .chat-input-row input{
   flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;color:var(--txt);
   padding:11px 14px;font-family:inherit;font-size:.86rem;outline:none;
@@ -408,6 +412,35 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
   animation:goldPop .7s ease-out forwards;
 }
 @keyframes goldPop{to{transform:translateY(-60px) scale(1.6);opacity:0}}
+
+/* ---------------- boss fight ---------------- */
+#bossWrap{
+  position:fixed;left:0;right:0;bottom:calc(var(--sb-h) + 12px);z-index:36;
+  display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 12px;
+  pointer-events:none;
+}
+#bossBtn{
+  pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:radial-gradient(circle at 35% 30%,#ffb36b,#e05228 55%,#7a1208);
+  border:3px solid #ffd24a;border-radius:22px;padding:12px 22px 10px;color:#fff;
+  box-shadow:0 0 42px rgba(255,80,40,.75);animation:bossPulse 1.1s ease-in-out infinite;
+}
+@keyframes bossPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+#bossEmoji{font-size:2.6rem;line-height:1}
+#bossName{font-weight:900;font-size:.72rem;letter-spacing:.5px}
+#bossHPBar{width:200px;max-width:62vw;height:9px;border-radius:99px;background:rgba(0,0,0,.45);overflow:hidden;border:1px solid rgba(255,255,255,.25)}
+#bossHP{height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#ff5d6c,#ffd24a);transition:width .15s}
+#bossTimer{font-weight:900;font-size:.62rem;color:#ffe08a}
+
+/* ---------------- suika start overlay ---------------- */
+.suika-start-emoji{font-size:3.4rem;animation:melonFloat 2.6s ease-in-out infinite}
+.suika-start-card h3{font-size:1.35rem;margin-top:4px}
+.suika-start-list{text-align:left;margin:10px 0 14px;font-size:.78rem;line-height:1.7;color:var(--dim)}
+.suika-start-list b{color:var(--txt)}
+
+/* ---------------- roulette button ---------------- */
+#rouletteSpin{width:100%;max-width:300px;margin:0 auto}
+#rouletteSpin:disabled{opacity:.45;filter:grayscale(.5);cursor:default}
 
 /* ---------------- toasts / fx ---------------- */
 #toasts{position:fixed;top:calc(var(--sb-h) + 10px);left:0;right:0;z-index:60;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
@@ -448,11 +481,17 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
 .modal input:focus{border-color:var(--acc)}
 .modal-actions{display:flex;gap:10px;justify-content:center}
 .modal-hint{color:var(--dim);font-size:.7rem;margin-top:12px}
+.tut-steps{display:flex;flex-direction:column;gap:9px;margin:4px 0 16px;text-align:left}
+.tut-step{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
+.tut-step .ts-emoji{font-size:1.3rem;width:30px;text-align:center}
+.tut-step .ts-title{font-weight:900;font-size:.8rem}
+.tut-step .ts-desc{color:var(--dim);font-size:.72rem;line-height:1.45}
+.tut-step .ts-arrow{color:var(--acc);font-weight:900;font-size:1.1rem}
 
 /* ---------------- footer ---------------- */
 #footer{
-  text-align:center;color:var(--dim);font-size:.7rem;padding:18px 12px calc(var(--sb-h) + 26px);
-  border-top:1px solid var(--line);margin-top:10px;line-height:1.7;
+  text-align:center;color:var(--dim);font-size:.7rem;padding:18px 12px 10px;
+  border-top:1px solid var(--line);margin-top:14px;line-height:1.7;
 }
 #footer b{color:var(--txt)}
 
@@ -460,7 +499,7 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
 @media(min-width:900px){
   #sidebar{
     position:fixed;left:0;top:0;bottom:0;width:150px;z-index:45;display:flex;flex-direction:column;
-    gap:6px;padding:calc(var(--sb-h) + 14px) 10px 14px;background:rgba(8,20,13,.85);backdrop-filter:blur(16px);
+    gap:6px;padding:calc(var(--tb-h,52px) + 14px) 10px 14px;background:rgba(8,20,13,.85);backdrop-filter:blur(16px);
     border-right:1px solid var(--line);
   }
   #sidebar button{
@@ -470,8 +509,24 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
   #sidebar button .emoji{font-size:1.2rem}
   #sidebar button.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04220f}
   .bottom-nav{display:none}
-  main{max-width:760px;margin-left:150px}
-  #footer{max-width:760px;margin-left:150px}
-  .help-grid{grid-template-columns:repeat(2,1fr)}
+  main{left:150px}
+  .logo em{display:inline}
   .chat-input-row{bottom:8px}
+}
+
+/* ---------------- ultra-narrow phones ---------------- */
+@media(max-width:420px){
+  .logo{font-size:1rem}
+  .logo b{font-size:.85rem}
+  .logo em{display:none}
+  .chip{padding:4px 7px;font-size:.68rem}
+  .chip .chip-emoji{font-size:.8rem}
+  .chip.icon-only{padding:4px 7px}
+  .lv-pill{font-size:.55rem;padding:1px 5px}
+  .chip.name-chip #hudName{max-width:58px}
+  .big-number{font-size:2.1rem}
+  .sstat b{font-size:.95rem}
+}
+@media(max-width:350px){
+  #hudSeeds{display:none}
 }

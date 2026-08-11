@@ -83,14 +83,19 @@ const Leaderboard = (()=>{
   function throttledSubmit(){
     if(!initDone) return;
     const v=G.save.lifetimeEarned||0;
-    if(v>lastSubmitValue*1.001+5||v<lastSubmitValue*0.5){
+    const c=G.save.crystals||0;
+    if(v>lastSubmitValue*1.001+5||v<lastSubmitValue*0.5||Math.abs(c-lastSubmitCrystals)>2){
       lastSubmitValue=v;
+      lastSubmitCrystals=c;
       submit(false);
     }
   }
 
+  let lastSubmitCrystals=0;
+
   function bump(){
     lastSubmitValue=G.save.lifetimeEarned||0;
+    lastSubmitCrystals=G.save.crystals||0;
     submit(true);
   }
 
@@ -110,12 +115,13 @@ const Leaderboard = (()=>{
     scores.slice(0,100).forEach((s,i)=>{
       if(s.id===me.id) myRank=i+1;
       const extra=(s.asc>0?('⭐ '+s.asc+' · 🌱 '+fmt(s.seeds||0)):'🌱 '+fmt(s.seeds||0));
+      const live=s.id===me.id?(' · '+fmt(Math.floor(G.save.melons||0))+' 🍈 now'):'';
       html+='<div class="lb-row'+(s.id===me.id?' me':'')+'">'+
         '<span class="lb-pos">'+(i<3?medals[i]:'#'+(i+1))+'</span>'+
         '<span class="lb-name"><span>'+(s.skin||'🍉')+'</span>'+escapeHtml(s.name||'?')+'<span class="lv-badge">Lv'+(s.level||1)+'</span></span>'+
         '<span class="lb-extra">'+extra+'</span>'+
         '<span class="lb-score">'+fmt(s.melons)+'</span>'+
-        '<span class="lb-crys">💎 '+fmt(s.crystals||0)+'</span></div>';
+        '<span class="lb-crys">💎 '+fmt(s.crystals||0)+live+'</span></div>';
     });
     list.innerHTML=html;
     if(myRank<0) myRank=scores.findIndex(s=>s.id===me.id)+1;

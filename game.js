@@ -12,7 +12,8 @@ const G = window.G = {
   goldenBusy:false, goldTimer:null,
   tick:0, last:Date.now(), lastSave:0,
   soundOn:true, AC:null, bldRefs:{}, achCount:-1, myRank:0,
-  evt:null, evtPolled:0, clickCryCounter:0
+  evt:null, evtPolled:0, clickCryCounter:0,
+  bossTimer:null, bossTicker:null
 };
 
 function $(id){ return document.getElementById(id); }
@@ -31,7 +32,11 @@ const BUILDINGS=[
   {id:'ship',    name:'Star Freighter',emoji:'🛸', cost:5.1e9,  rate:260000, cb:22000},
   {id:'planet',  name:'Melon Planet',  emoji:'🌍', cost:75e9,   rate:1.6e6, cb:100000},
   {id:'galaxy',  name:'Melon Galaxy',  emoji:'🌌', cost:1e12,   rate:1e7,   cb:5e5},
-  {id:'universe',name:'Melonverse',    emoji:'🌠', cost:14e12,  rate:6.5e7, cb:2.5e6}
+  {id:'universe',name:'Melonverse',    emoji:'🌠', cost:14e12,  rate:6.5e7, cb:2.5e6},
+  {id:'time',    name:'Time Garden',   emoji:'⏳', cost:2e14,   rate:5e8,   cb:1.5e7},
+  {id:'void',    name:'Void Melon',    emoji:'🕳️', cost:3e15,   rate:4e9,   cb:1e8},
+  {id:'angels',  name:'Angel Orchard', emoji:'😇', cost:5e16,   rate:3.5e10, cb:8e8},
+  {id:'infinity',name:'Infinity Garden',emoji:'♾️', cost:8e17,  rate:2.5e11, cb:5e9}
 ];
 
 const RANKS=[
@@ -48,7 +53,12 @@ const ASC_UP=[
   {id:'as4', emoji:'👆', name:'Titan Thumbs',   desc:'+50% tap power (per level)',                  max:10, base:15, mult:1.6},
   {id:'as5', emoji:'💤', name:'Dream Harvest',  desc:'+2× offline earnings (per level)',            max:5,  base:10, mult:2},
   {id:'as6', emoji:'🍀', name:'Golden Orchard', desc:'Golden melons appear 2× more often',          max:5,  base:12, mult:2},
-  {id:'as7', emoji:'🧬', name:'Starter Seeds',  desc:'Start every run with 25 vines',               max:1,  base:50, mult:1}
+  {id:'as7', emoji:'🧬', name:'Starter Seeds',  desc:'Start every run with 25 vines',               max:1,  base:50, mult:1},
+  {id:'as8', emoji:'🤖', name:'Auto Ascension', desc:'+1 auto tap per second (per level)',          max:5,  base:15, mult:2},
+  {id:'as9', emoji:'👑', name:'Boss Slayer',    desc:'+50% boss rewards (per level)',               max:5,  base:12, mult:2},
+  {id:'as10',emoji:'🎁', name:'Crate Magnet',   desc:'Crates drop 2× more often (per level)',       max:5,  base:10, mult:2},
+  {id:'as11',emoji:'🌙', name:'Moon Blessing',  desc:'+25% offline earnings (per level)',           max:5,  base:15, mult:2},
+  {id:'as12',emoji:'💠', name:'Crystal Heart',  desc:'+2 💎 per ascension (per level)',             max:10, base:25, mult:1.8}
 ];
 
 const SHOP=[
@@ -57,7 +67,11 @@ const SHOP=[
   {id:'sh3', emoji:'⏳', name:'Time Warp Core',  desc:'+4h offline earning cap (per level)', max:6,  base:10, mult:2},
   {id:'sh4', emoji:'🍀', name:'Lucky Charm',     desc:'Golden melons 2× more often',        max:6,  base:8,  mult:2},
   {id:'sh5', emoji:'✨', name:'Golden Feast',    desc:'+50% golden melon rewards',          max:10, base:12, mult:1.8},
-  {id:'sh6', emoji:'🔥', name:'Combo King',      desc:'Combo lasts +1s, max combo +5',      max:10, base:7,  mult:1.7}
+  {id:'sh6', emoji:'🔥', name:'Combo King',      desc:'Combo lasts +1s, max combo +5',      max:10, base:7,  mult:1.7},
+  {id:'sh7', emoji:'📦', name:'Crate Magnet',    desc:'Crates 2× more likely to drop',      max:6,  base:10, mult:2},
+  {id:'sh8', emoji:'🎯', name:'Lucky Strike',    desc:'+25% boss rewards',                  max:6,  base:12, mult:2},
+  {id:'sh9', emoji:'🎡', name:'Spin Discount',   desc:'Roulette -1 💎 cost per level',      max:5,  base:8,  mult:2},
+  {id:'sh10',emoji:'💫', name:'Star Boost',      desc:'+50% mini game melons per level',    max:10, base:12, mult:1.9}
 ];
 
 const SKINS=[
@@ -78,18 +92,33 @@ const QUESTS=[
   {id:'q_first_tap',e:'👆',n:'First Tap',d:'Tap the watermelon once',cry:2,xp:20,need:()=>G.save.totalClicks>=1},
   {id:'q_first_buy',e:'🧺',n:'Green Thumb',d:'Buy your first farm',cry:3,xp:30,need:()=>totalBuildings()>=1},
   {id:'q_1k',e:'🍈',n:'Melon Boost',d:'Harvest 1K lifetime melons',cry:3,xp:40,need:()=>G.save.lifetimeEarned>=1e3},
+  {id:'q_10k',e:'🍈',n:'Big Harvest',d:'Harvest 10K lifetime melons',cry:4,xp:50,need:()=>G.save.lifetimeEarned>=1e4},
+  {id:'q_1m',e:'💎',n:'Millionaire',d:'Harvest 1M lifetime melons',cry:8,xp:90,need:()=>G.save.lifetimeEarned>=1e6},
+  {id:'q_1b',e:'🚀',n:'Billionaire',d:'Harvest 1B lifetime melons',cry:15,xp:160,need:()=>G.save.lifetimeEarned>=1e9},
   {id:'q_10_buildings',e:'🏗️',n:'Builder',d:'Own 10 buildings',cry:5,xp:60,need:()=>totalBuildings()>=10},
   {id:'q_combo5',e:'🔥',n:'On Fire',d:'Reach a ×5 combo',cry:4,xp:40,need:()=>G.save.maxCombo>=5},
   {id:'q_golden',e:'🍀',n:'Lucky Break',d:'Click a golden melon',cry:5,xp:50,need:()=>G.save.goldenClicks>=1},
   {id:'q_suika1',e:'🍉',n:'Stack Master',d:'Play Suika once',cry:5,xp:50,need:()=>G.save.suika.games>=1},
   {id:'q_suika500',e:'🎯',n:'Suika Pro',d:'Score 500 in a Suika run',cry:8,xp:80,need:()=>G.save.suika.best>=500},
+  {id:'q_suika2000',e:'🏅',n:'Suika Legend',d:'Score 2,000 in a Suika run',cry:20,xp:200,need:()=>G.save.suika.best>=2000},
+  {id:'q_suika_merges',e:'🔗',n:'Merge Machine',d:'Make 500 Suika merges',cry:15,xp:150,need:()=>G.save.suika.merges>=500},
   {id:'q_suika_wm',e:'🏆',n:'Watermelon King',d:'Merge a watermelon in Suika',cry:15,xp:150,need:()=>G.save.suika.watermelons>=1},
   {id:'q_asc1',e:'⭐',n:'Stardust',d:'Ascend once',cry:10,xp:100,need:()=>G.save.ascensions>=1},
   {id:'q_asc5',e:'✨',n:'Cosmic Soul',d:'Ascend 5 times',cry:20,xp:200,need:()=>G.save.ascensions>=5},
+  {id:'q_asc10',e:'🌟',n:'Ascension Pro',d:'Ascend 10 times',cry:30,xp:300,need:()=>G.save.ascensions>=10},
+  {id:'q_asc25',e:'👑',n:'Ascension Master',d:'Ascend 25 times',cry:60,xp:600,need:()=>G.save.ascensions>=25},
   {id:'q_crate',e:'📦',n:"What's Inside?",d:'Open a crate',cry:5,xp:50,need:()=>G.save.cratesOpened>=1},
   {id:'q_whack',e:'🔨',n:'Whack It',d:'Play Whack-a-Melon once',cry:5,xp:50,need:()=>G.save.whack.games>=1},
+  {id:'q_whack500',e:'🔨',n:'Whack Master',d:'Score 500 in Whack-a-Melon',cry:10,xp:100,need:()=>G.save.whack.best>=500},
   {id:'q_coll5',e:'🗃️',n:'Collector',d:'Find 5 collection items',cry:6,xp:60,need:()=>Object.keys(G.save.coll).length>=5},
-  {id:'q_lvl5',e:'🎓',n:'Rising Star',d:'Reach Level 5',cry:6,xp:60,need:()=>G.save.level>=5}
+  {id:'q_coll15',e:'🗃️',n:'Collection Pro',d:'Find 15 collection items',cry:15,xp:150,need:()=>Object.keys(G.save.coll).length>=15},
+  {id:'q_coll27',e:'🏛️',n:'Completionist',d:'Find ALL collection items',cry:40,xp:400,need:()=>Object.keys(G.save.coll).length>=ITEMS.length},
+  {id:'q_boss',e:'👹',n:'Boss Slayer',d:'Defeat your first boss',cry:8,xp:80,need:()=>(G.save.bossKills||0)>=1},
+  {id:'q_boss5',e:'⚔️',n:'Boss Hunter',d:'Defeat 5 bosses',cry:20,xp:200,need:()=>(G.save.bossKills||0)>=5},
+  {id:'q_lvl5',e:'🎓',n:'Rising Star',d:'Reach Level 5',cry:6,xp:60,need:()=>G.save.level>=5},
+  {id:'q_lvl10',e:'🎓',n:'Scholar',d:'Reach Level 10',cry:10,xp:100,need:()=>G.save.level>=10},
+  {id:'q_lvl25',e:'🧠',n:'Professor',d:'Reach Level 25',cry:20,xp:200,need:()=>G.save.level>=25},
+  {id:'q_seed100',e:'🌱',n:'Seed Collector',d:'Hold 100 total seeds',cry:15,xp:150,need:()=>G.save.totalSeeds>=100}
 ];
 
 const DQ=[
@@ -98,9 +127,15 @@ const DQ=[
   {id:'d_grow',e:'🍈',n:'Harvest',t:'Grow melons (lifetime)',goal:1e5,unit:' 🍈'},
   {id:'d_combo',e:'🔥',n:'Combo Run',t:'Reach a combo of',goal:8,unit:''},
   {id:'d_suika',e:'🍉',n:'Fruit Stacker',t:'Play Suika',goal:1,unit:' time'},
+  {id:'d_merge',e:'🔗',n:'Merge Master',t:'Merge fruits in Suika',goal:50,unit:' merges'},
+  {id:'d_score',e:'🎯',n:'High Score',t:'Score in Suika',goal:1200,unit:''},
   {id:'d_crate',e:'📦',n:'Crate Hunter',t:'Open crates',goal:1,unit:' crate'},
   {id:'d_whack',e:'🔨',n:'Whacker',t:'Play Whack-a-Melon',goal:1,unit:' time'},
-  {id:'d_golden',e:'🍀',n:'Golden Hunter',t:'Click golden melons',goal:2,unit:' melons'}
+  {id:'d_whackscore',e:'🔨',n:'Whack Pro',t:'Score in Whack-a-Melon',goal:100,unit:''},
+  {id:'d_golden',e:'🍀',n:'Golden Hunter',t:'Click golden melons',goal:2,unit:' melons'},
+  {id:'d_boss',e:'👹',n:'Boss Buster',t:'Defeat bosses',goal:1,unit:' boss'},
+  {id:'d_ascend',e:'⭐',n:'Ascender',t:'Ascend',goal:1,unit:' time'},
+  {id:'d_cry',e:'💎',n:'Crystal Collector',t:'Earn crystals',goal:10,unit:' 💎'}
 ];
 
 const ITEMS=[
@@ -110,29 +145,42 @@ const ITEMS=[
   {id:'sign',e:'🪧',n:'Farm Sign',r:'common'},
   {id:'grape',e:'🍇',n:'Tiny Grape',r:'common'},
   {id:'hoe',e:'⛏️',n:'Rusty Hoe',r:'common'},
+  {id:'helm',e:'🪖',n:'Farmer Helmet',r:'common'},
+  {id:'water',e:'💧',n:'Magic Water',r:'common'},
   {id:'shard',e:'💠',n:'Crystal Shard',r:'uncommon'},
   {id:'clover',e:'🍀',n:'Lucky Clover',r:'uncommon'},
   {id:'rind',e:'🍈',n:'Golden Rind',r:'uncommon'},
   {id:'combo',e:'🎟️',n:'Combo Token',r:'uncommon'},
   {id:'fuel',e:'⛽',n:'Rocket Fuel',r:'uncommon'},
   {id:'moonrock',e:'🪨',n:'Moon Rock',r:'uncommon'},
+  {id:'bee',e:'🐝',n:'Melon Bee',r:'uncommon'},
+  {id:'axe',e:'🪓',n:'Space Axe',r:'uncommon'},
   {id:'vine',e:'🍃',n:'Ancient Vine',r:'rare'},
   {id:'stardust',e:'✨',n:'Stardust Seed',r:'rare'},
   {id:'phoenix',e:'🔥',n:'Phoenix Melon',r:'rare'},
   {id:'pebble',e:'⏳',n:'Time Pebble',r:'rare'},
   {id:'dragon',e:'🐉',n:'Dragon Fruit',r:'rare'},
   {id:'jelly',e:'🫙',n:'Royal Jelly',r:'rare'},
+  {id:'prism',e:'🔮',n:'Crystal Prism',r:'rare'},
+  {id:'dino',e:'🦖',n:'Melon Dino',r:'rare'},
   {id:'goldwm',e:'🥇',n:'Golden Watermelon',r:'epic'},
   {id:'pearl',e:'🦪',n:'Galaxy Pearl',r:'epic'},
   {id:'nova',e:'🌌',n:'Frozen Nova',r:'epic'},
   {id:'ember',e:'🌋',n:'Void Ember',r:'epic'},
   {id:'rainbow',e:'🌈',n:'Rainbow Melon',r:'epic'},
+  {id:'ufo',e:'👽',n:'Alien Fruit',r:'epic'},
+  {id:'comet',e:'☄️',n:'Comet Shard',r:'epic'},
+  {id:'voidorb',e:'🫧',n:'Void Orb',r:'epic'},
   {id:'boss',e:'👑',n:'Boss Watermelon',r:'legendary'},
   {id:'knife',e:'🔪',n:'Cosmic Chef Knife',r:'legendary'},
   {id:'infseed',e:'♾️',n:'Infinity Seed',r:'legendary'},
-  {id:'crown',e:'💎',n:'Melon God Crown',r:'legendary'}
+  {id:'crown',e:'💎',n:'Melon God Crown',r:'legendary'},
+  {id:'goddess',e:'🧚',n:'Melon Goddess',r:'legendary'},
+  {id:'heart',e:'💖',n:'Crystal Heart',r:'legendary'},
+  {id:'multiv',e:'🌌',n:'Multiverse Key',r:'mythic'},
+  {id:'melonking',e:'👑',n:'Melon King Crown',r:'mythic'}
 ];
-const RARITY={common:{w:55,v:1,c:'#a8c0ae'},uncommon:{w:25,v:3,c:'#7fe7ff'},rare:{w:12,v:8,c:'#c39bd3'},epic:{w:6,v:20,c:'#ff9de8'},legendary:{w:2,v:50,c:'#ffd24a'}};
+const RARITY={common:{w:54,v:1,c:'#a8c0ae'},uncommon:{w:25,v:3,c:'#7fe7ff'},rare:{w:12,v:8,c:'#c39bd3'},epic:{w:6,v:20,c:'#ff9de8'},legendary:{w:2,v:50,c:'#ffd24a'},mythic:{w:1,v:150,c:'#ff6b9d'}};
 
 const EVENTS=[
   {id:'meteor',e:'🌠',n:'Meteor Shower',d:'All melon production ×2!'},
@@ -212,7 +260,27 @@ const ACH=[
   {id:'cy1',e:'💎',n:'Crystal Seeker',d:'Hold 25 crystals',g:2,need:()=>G.save.crystals>=25},
   {id:'cy2',e:'💎',n:'Crystal Hoarder',d:'Hold 100 crystals',g:5,need:()=>G.save.crystals>=100},
   {id:'cy3',e:'💎',n:'Crystal Lord',d:'Hold 500 crystals',g:12,need:()=>G.save.crystals>=500},
-  {id:'of1',e:'💤',n:'Deep Sleeper',d:'Earn melons while away',g:1,need:()=>G.save.offlineEarns>=1}
+  {id:'su1',e:'🍉',n:'Suika Beginner',d:'Play Suika once',g:1,need:()=>G.save.suika.games>=1},
+  {id:'su2',e:'🍉',n:'Fruit Stacker',d:'Score 500 in Suika',g:3,need:()=>G.save.suika.best>=500},
+  {id:'su3',e:'🏆',n:'Watermelon King',d:'Score 1,000 in Suika',g:5,need:()=>G.save.suika.best>=1000},
+  {id:'su4',e:'👑',n:'Suika Grandmaster',d:'Score 2,500 in Suika',g:10,need:()=>G.save.suika.best>=2500},
+  {id:'su5',e:'🔗',n:'Merge Machine',d:'Make 500 Suika merges',g:4,need:()=>G.save.suika.merges>=500},
+  {id:'cr1',e:'📦',n:'Crate Opener',d:'Open a crate',g:1,need:()=>G.save.cratesOpened>=1},
+  {id:'cr2',e:'📦',n:'Crate Fiend',d:'Open 25 crates',g:4,need:()=>G.save.cratesOpened>=25},
+  {id:'cr3',e:'📦',n:'Crate Maniac',d:'Open 100 crates',g:10,need:()=>G.save.cratesOpened>=100},
+  {id:'ck1',e:'🗃️',n:'Collector',d:'Find 5 collection items',g:2,need:()=>Object.keys(G.save.coll).length>=5},
+  {id:'ck2',e:'🗃️',n:'Curator',d:'Find 15 collection items',g:5,need:()=>Object.keys(G.save.coll).length>=15},
+  {id:'ck3',e:'🏛️',n:'Museum Owner',d:'Find 30 collection items',g:12,need:()=>Object.keys(G.save.coll).length>=30},
+  {id:'wh1',e:'🔨',n:'Whack Starter',d:'Play Whack-a-Melon once',g:1,need:()=>G.save.whack.games>=1},
+  {id:'wh2',e:'🔨',n:'Whack Pro',d:'Score 500 in Whack-a-Melon',g:5,need:()=>G.save.whack.best>=500},
+  {id:'rl1',e:'🎡',n:'Lucky Spin',d:'Spin the roulette once',g:1,need:()=>G.save.roulette.spins>=1},
+  {id:'rl2',e:'🎡',n:'Roulette Regular',d:'Spin the roulette 10 times',g:4,need:()=>G.save.roulette.spins>=10},
+  {id:'rl3',e:'🎡',n:'Crystal Gambler',d:'Win a JACKPOT on the roulette',g:8,need:()=>G.save.roulette.jackpots>=1},
+  {id:'bo1',e:'👹',n:'First Blood',d:'Defeat a boss',g:5,need:()=>(G.save.bossKills||0)>=1},
+  {id:'bo2',e:'⚔️',n:'Boss Slayer',d:'Defeat 10 bosses',g:12,need:()=>(G.save.bossKills||0)>=10},
+  {id:'bo3',e:'🐉',n:'Boss Legend',d:'Defeat 50 bosses',g:25,need:()=>(G.save.bossKills||0)>=50},
+  {id:'of1',e:'💤',n:'Deep Sleeper',d:'Earn melons while away',g:1,need:()=>G.save.offlineEarns>=1},
+  {id:'of2',e:'💤',n:'Master Sleeper',d:'Earn melons while away 10 times',g:5,need:()=>G.save.offlineEarns>=10}
 ];
 
 /* ---------------- helpers ---------------- */
@@ -239,7 +307,7 @@ function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 /* ---------------- levels / xp ---------------- */
 
 function xpNeed(l){ return Math.floor(100*Math.pow(l,1.6)); }
-function levelMult(){ return 1+0.02*(G.save.level-1); }
+function levelMult(){ return 1+0.025*(G.save.level-1); }
 function gainXp(n){
   if(!(n>0)) return;
   G.save.xp+=n;
@@ -247,7 +315,7 @@ function gainXp(n){
     G.save.xp-=xpNeed(G.save.level);
     G.save.level++;
     const rew=2+G.save.level;
-    G.save.crystals+=rew;
+    addCrystals(rew);
     toast('LEVEL UP! Now Level '+G.save.level+'! +'+rew+' 💎','🎉');
     beepAch();
   }
@@ -299,11 +367,11 @@ function clickPower(withCombo){
   const evt=(G.evt&&G.evt.id==='turbo')?5:1;
   return clickBase()*clickMult()*combo*tap*evt;
 }
-function autoPerSec(){ return shopLvl('sh1')*clickPower(); }
+function autoPerSec(){ return (shopLvl('sh1')+level('as8'))*clickPower(); }
 function frenzyMult(){ return (Date.now()<G.frenzyUntil)?7:1; }
 function eventProdMult(){ return (G.evt&&(G.evt.id==='meteor'||G.evt.id==='turbo'))?2:1; }
 function effectivePerSec(){ return perSecRaw()*globalMult()*seedMult()*frenzyMult()*eventProdMult()+autoPerSec(); }
-function calcSeedGain(){ return Math.floor(Math.pow(G.save.runEarned/1e6,0.5)*(1+0.25*level('as2'))); }
+function calcSeedGain(){ return Math.floor(Math.pow(G.save.runEarned/1e6,0.55)*(1+0.25*level('as2'))); }
 function rankInfo(){
   let i=0;
   for(let r=0;r<RANKS.length;r++) if(G.save.lifetimeEarned>=RANKS[r][0]) i=r;
@@ -314,19 +382,21 @@ function rankInfo(){
 }
 
 function addMelons(n){ if(n<=0)return; G.save.melons+=n; G.save.runEarned+=n; G.save.lifetimeEarned+=n; }
+function addCrystals(n){ if(!(n>0)) return; G.save.crystals+=n; G.save.crystalsEarned=(G.save.crystalsEarned||0)+n; }
 
 /* ---------------- save/load ---------------- */
 
 function defaultSave(){
   return {v:2,name:'',playerId:'',melons:0,runEarned:0,lifetimeEarned:0,buildings:{},upgrades:[],
-    seeds:0,totalSeeds:0,ascensions:0,crystals:0,asc:{},shop:{},ach:[],
+    seeds:0,totalSeeds:0,ascensions:0,crystals:0,crystalsEarned:0,asc:{},shop:{},ach:[],
     totalClicks:0,goldenClicks:0,maxCombo:0,offlineEarns:0,
     lastDaily:null,dailyStreak:0,dailyClaimed:true,lastOnline:Date.now(),sound:true,
     xp:0,level:1,quests:{},dqDay:'',dqIds:[],dqProg:{},dqDone:[],dqBase:{},
     coll:{},inv:0,cratesOpened:0,skins:[],skin:'classic',
     suika:{best:0,games:0,merges:0,watermelons:0,suikaBoost:false},
-    whack:{best:0,games:0},roulette:{spins:0,wins:0},
-    eventClaimed:'',lastEventEnd:0};
+    whack:{best:0,games:0},    roulette:{spins:0,wins:0,jackpots:0},
+    eventClaimed:'',lastEventEnd:0,
+    boss:{id:null,name:'',emoji:'👹',hp:0,maxHp:0,nextAt:Date.now()+2400000,tier:1,kills:0,fightUntil:0}};
 }
 function loadGame(){
   let s=null;
@@ -348,7 +418,8 @@ function loadGame(){
   G.save.skin=G.save.skin||'classic';
   G.save.suika=Object.assign({best:0,games:0,merges:0,watermelons:0,suikaBoost:false},G.save.suika||{});
   G.save.whack=Object.assign({best:0,games:0},G.save.whack||{});
-  G.save.roulette=Object.assign({spins:0,wins:0},G.save.roulette||{});
+  G.save.roulette=Object.assign({spins:0,wins:0,jackpots:0},G.save.roulette||{});
+  G.save.boss=Object.assign({id:null,name:'',emoji:'👹',hp:0,maxHp:0,nextAt:Date.now()+2400000,tier:1,kills:0,fightUntil:0},G.save.boss||{});
   G.save.level=G.save.level||1;
   G.save.xp=G.save.xp||0;
   G.soundOn=G.save.sound!==false;
@@ -399,6 +470,7 @@ function setView(v){
   if(v==='quests'){ renderQuestTab(); renderCollection(); renderInventory(); }
   if(v==='chat'&&typeof Chat!=='undefined') Chat.onOpen();
   if(v==='grow') updateEventBanner();
+  if(v!=='mini'&&typeof window.suikaPause==='function') window.suikaPause();
   window.scrollTo(0,0);
 }
 function switchGrowTab(t){
@@ -418,6 +490,7 @@ function refreshHud(){
   $('hudCrateN').textContent=G.save.inv;
   const r=rankInfo();
   $('hudRankEmoji')&&($('hudRankEmoji').textContent=r.emoji);
+  updateRouletteUI();
 }
 
 function updateComboUI(){
@@ -469,7 +542,7 @@ function buyBuilding(id){
   if(ownedN===0) toast('Bought your first '+b.name+'! '+b.emoji,'🎉');
   beepBuy(); gainXp(5*n); dropCrateChance(0.03*n);
   updateBuildings(); updateStats();
-  Leaderboard&&Leaderboard.throttledSubmit&&Leaderboard.throttledSubmit();
+  Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
 }
 function setBuyMult(n){ G.buyMult=n; document.querySelectorAll('#buyToggle button').forEach(b=>b.classList.toggle('on',+b.dataset.n===n)); updateBuildings(); }
 
@@ -494,6 +567,7 @@ function buyUpgrade(id){
   G.save.melons-=u.cost; G.save.upgrades.push(id);
   beepBuy(); toast(u.name+' bought! '+u.emoji,'🔧'); gainXp(10);
   reRenderPanels(); updateBuildings(); updateStats();
+  Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
 }
 
 /* ---------------- ascension / prestige ---------------- */
@@ -527,7 +601,7 @@ function buyAsc(id){
   if(G.save.seeds<cost) return;
   G.save.seeds-=cost; G.save.asc[id]=lv+1;
   beepBuy(); toast(a.name+' → Lv '+(lv+1)+'! '+a.emoji,'🌱'); gainXp(20);
-  reRenderPanels(); updateStats(); Leaderboard&&Leaderboard.throttledSubmit&&Leaderboard.throttledSubmit();
+  reRenderPanels(); updateStats(); Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
 }
 function openAscendConfirm(){
   const gain=calcSeedGain();
@@ -541,6 +615,7 @@ function doAscend(){
   G.save.melons=0; G.save.runEarned=0; G.save.buildings={}; G.save.upgrades=[]; G.save.totalClicks=0;
   G.combo=0;
   if(level('as7')>0) G.save.buildings.vine=25;
+  addCrystals(2*level('as12'));
   closeModal('veilAscend');
   beepAscend();
   gainXp(100+gain);
@@ -567,6 +642,10 @@ function renderShop(){
     if(s.id==='sh4') desc='golden melons ×'+fmt(Math.pow(2,lv))+' more often';
     if(s.id==='sh5') desc='+'+Math.round(lv*50)+'% golden rewards';
     if(s.id==='sh6') desc='+'+lv+'s combo window · +'+(lv*5)+' max combo';
+    if(s.id==='sh7') desc='crates ×'+fmt(Math.pow(2,lv))+' more likely';
+    if(s.id==='sh8') desc='+'+Math.round(lv*25)+'% boss rewards';
+    if(s.id==='sh9') desc='roulette spins cost '+Math.max(1,10-lv)+' 💎';
+    if(s.id==='sh10') desc='+'+Math.round(lv*50)+'% mini game melons';
     html+='<div class="up-card'+(maxed?' bought':can?' afford':'')+'" onclick="buyShop(\''+s.id+'\')">'+
       '<div class="u-emoji">'+(maxed?'✅':s.emoji)+'</div>'+
       '<div class="u-info"><div class="u-name">'+s.name+' <span class="u-lv">Lv '+lv+'/'+s.max+'</span></div>'+
@@ -642,12 +721,12 @@ function checkAchievements(){
   for(const a of ACH){
     if(G.save.ach.includes(a.id)) continue;
     if(a.need()){
-      G.save.ach.push(a.id); G.save.crystals+=a.g;
+      G.save.ach.push(a.id); addCrystals(a.g);
       toast(a.n+' unlocked! +'+a.g+' 💎','🏆');
       beepAch(); any=true;
     }
   }
-  if(any){ refreshHud(); Leaderboard&&Leaderboard.throttledSubmit&&Leaderboard.throttledSubmit(); }
+  if(any){ refreshHud(); Leaderboard&&Leaderboard.bump&&Leaderboard.bump(); }
 }
 function renderRankCard(){
   const r=rankInfo();
@@ -679,7 +758,7 @@ function rollDailyQuests(){
   while(pick.length<4&&pool.length){ const i=Math.floor(Math.random()*pool.length); pick.push(pool.splice(i,1)[0]); }
   G.save.dqIds=pick.map(q=>q.id);
   G.save.dqProg={}; G.save.dqDone=[];
-  G.save.dqBase={ grow:G.save.lifetimeEarned, combo:G.save.maxCombo, golden:G.save.goldenClicks, crates:G.save.cratesOpened, suika:G.save.suika.games, whack:G.save.whack.games, buy:0, tap:0 };
+  G.save.dqBase={ grow:G.save.lifetimeEarned, combo:G.save.maxCombo, golden:G.save.goldenClicks, crates:G.save.cratesOpened, suika:G.save.suika.games, whack:G.save.whack.games, merges:G.save.suika.merges, score:G.save.suika.best, whackscore:G.save.whack.best, boss:(G.save.bossKills||0), asc:G.save.ascensions, cry:(G.save.crystalsEarned||0), buy:0, tap:0 };
   G.save.dqDay=new Date().toDateString();
   renderQuestTab();
 }
@@ -687,7 +766,7 @@ function claimDaily(){
   if(G.save.dailyClaimed) return;
   G.save.lastDaily=new Date().toDateString(); G.save.dailyClaimed=true;
   const c=Math.min(4+G.save.dailyStreak,25);
-  G.save.crystals+=c; gainXp(25);
+  addCrystals(c); gainXp(25);
   $('dailyMsg').innerHTML='<b>Day '+G.save.dailyStreak+'</b> streak!<br>You earned <b>+'+c+' 💎</b> crystals!';
   openModal('veilDaily');
   toast('+'+c+' 💎 daily reward!','🎁');
@@ -699,7 +778,7 @@ function checkOffline(){
   if(dt>120){
     const cap=(8+4*shopLvl('sh3'))*3600;
     const offSec=Math.min(dt,cap);
-    const earned=effectivePerSec()*offSec*Math.pow(2,level('as5'));
+    const earned=effectivePerSec()*offSec*Math.pow(2,level('as5'))*(1+0.25*level('as11'));
     addMelons(earned);
     G.save.offlineEarns=(G.save.offlineEarns||0)+1;
     $('offlineMsg').innerHTML='You were away for <b>'+fmtDur(offSec)+'</b>.<br>Your melons kept growing and produced <b>'+fmt(earned)+' 🍈</b>!';
@@ -719,7 +798,13 @@ function dqProgress(id){
   if(id==='d_golden') return G.save.goldenClicks-(G.save.dqBase.golden||0);
   if(id==='d_crate') return G.save.cratesOpened-(G.save.dqBase.crates||0);
   if(id==='d_suika') return G.save.suika.games-(G.save.dqBase.suika||0);
+  if(id==='d_merge') return G.save.suika.merges-(G.save.dqBase.merges||0);
+  if(id==='d_score') return Math.max(0,(G.save.suika.best||0)-(G.save.dqBase.score||0));
   if(id==='d_whack') return G.save.whack.games-(G.save.dqBase.whack||0);
+  if(id==='d_whackscore') return Math.max(0,(G.save.whack.best||0)-(G.save.dqBase.whackscore||0));
+  if(id==='d_boss') return Math.max(0,(G.save.bossKills||0)-(G.save.dqBase.boss||0));
+  if(id==='d_ascend') return Math.max(0,G.save.ascensions-(G.save.dqBase.asc||0));
+  if(id==='d_cry') return Math.max(0,(G.save.crystalsEarned||0)-(G.save.dqBase.cry||0));
   return 0;
 }
 function renderQuestTab(){
@@ -760,14 +845,14 @@ function renderQuestTab(){
 }
 function claimQuest(id){
   const q=QUESTS.find(x=>x.id===id); if(!q||G.save.quests[id]||!q.need()) return;
-  G.save.quests[id]=true; G.save.crystals+=q.cry; gainXp(q.xp);
+  G.save.quests[id]=true; addCrystals(q.cry); gainXp(q.xp);
   toast(q.n+' complete! +'+q.cry+' 💎','🌟');
   beepAch(); renderQuestTab(); refreshHud(); checkAchievements();
   Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
 }
 function claimDailyQuest(id){
   const q=DQ.find(x=>x.id===id); if(!q||G.save.dqDone.includes(id)||dqProgress(id)<q.goal) return;
-  G.save.dqDone.push(id); G.save.crystals+=2; gainXp(30);
+  G.save.dqDone.push(id); addCrystals(2); gainXp(30);
   toast(q.n+' complete! +2 💎','🗓️');
   beepAch(); renderQuestTab(); refreshHud();
   Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
@@ -806,19 +891,19 @@ function clickGolden(){
     G.frenzyUntil=Date.now()+30000; msg='⚡ FRENZY! ×7 production for 30s!';
   }else if(r<0.70){
     const c=Math.max(1,Math.round(val*(1+Math.random()*4)))+(cryEvt?3:0);
-    G.save.crystals+=c; msg='🎁 JACKPOT! +'+c+' 💎!';
+    addCrystals(c); msg='🎁 JACKPOT! +'+c+' 💎!';
   }else if(r<0.85){
     G.tapUntil=Date.now()+30000; msg='👆 TAP STORM! ×10 tap power!';
   }else{
     const amt=per*3600*val; addMelons(amt); msg='🕐 TIME WARP! +1h of growth ('+fmt(amt)+')!';
   }
-  if(cryEvt) G.save.crystals+=1+Math.floor(Math.random()*3);
+  if(cryEvt) addCrystals(1+Math.floor(Math.random()*3));
   if(Math.random()<0.25){ dropCrate(1); }
   const gp=document.createElement('div'); gp.className='golden-pop'; gp.textContent='🍈';
   gp.style.left=(el.offsetLeft+24)+'px'; gp.style.top=(el.offsetTop+12)+'px';
   document.body.appendChild(gp); setTimeout(()=>gp.remove(),700);
   toast(msg,'🍈'); beepGolden(); refreshHud(); checkAchievements(); scheduleGolden();
-  Leaderboard&&Leaderboard.throttledSubmit&&Leaderboard.throttledSubmit();
+  Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
 }
 
 /* ---------------- crates / collection ---------------- */
@@ -831,7 +916,7 @@ function dropCrate(n){
   const btn=$('openCrateBtn'); if(btn) btn.textContent='Open a crate ('+G.save.inv+')';
 }
 function dropCrateChance(p){
-  if(Math.random()<p) dropCrate(1);
+  if(Math.random()<p*Math.pow(2,shopLvl('sh7'))) dropCrate(1);
 }
 function pickItem(){
   let roll=Math.random()*100, acc=0, chosen=null;
@@ -847,7 +932,7 @@ function openCrate(){
   if(btn) btn.textContent='Open a crate ('+G.save.inv+')';
   const item=pickItem(), rar=RARITY[item.r];
   const had=G.save.coll[item.id];
-  if(had){ G.save.coll[item.id]=had+1; G.save.crystals+=rar.v; }
+  if(had){ G.save.coll[item.id]=had+1; addCrystals(rar.v); }
   else G.save.coll[item.id]=1;
   $('crateEmoji').textContent=item.e;
   $('crateName').textContent=(had?'Duplicate: ':'NEW! ')+item.n;
@@ -886,7 +971,7 @@ function renderInventory(){
 
 /* ---------------- mini game bridges ---------------- */
 
-function miniRewardMult(){ return (G.evt&&G.evt.id==='fruit')?3:1; }
+function miniRewardMult(){ return (G.evt&&G.evt.id==='fruit'?3:1)*(1+0.5*shopLvl('sh10')); }
 window.suikaIdleFinish=function(score,stats){
   stats=stats||{merges:0,watermelons:0,bestTier:0};
   G.save.suika.games++;
@@ -904,7 +989,7 @@ window.suikaIdleFinish=function(score,stats){
   let drops=0;
   if(stats.watermelons>0){ dropCrate(stats.watermelons); drops+=stats.watermelons; }
   if(score>=1000){ dropCrate(1); drops++; }
-  G.save.crystals+=cry;
+  addCrystals(cry);
   window.suikaIdleRewardText='+'+fmt(m)+' 🍈 · +'+cry+' 💎'+(drops?(' · '+drops+' 📦'):'');
   toast('Suika run: +'+fmt(m)+' melons'+(cry?' +'+cry+' 💎':'')+'!','🍉');
   refreshHud(); checkAchievements(); checkQuests(true);
@@ -925,10 +1010,17 @@ function whackFinish(score){
 /* ---------------- roulette ---------------- */
 
 const ROULETTE_SEGS=[
-  {l:'100💎',w:2,pay:100},{l:'25💎',w:8,pay:25},{l:'10💎',w:20,pay:10},
+  {l:'100💎',w:2,pay:100,jackpot:true},{l:'25💎',w:8,pay:25},{l:'10💎',w:20,pay:10},
   {l:'5💎',w:25,pay:5},{l:'🍉×2',w:15,pay:0,boost:true},{l:'0',w:30,pay:0}
 ];
 let rouletteRotation=0,rouletteBusy=false;
+function rouletteCost(){ return Math.max(1,10-shopLvl('sh9')); }
+function updateRouletteUI(){
+  const b=$('rouletteSpin'); if(!b) return;
+  const c=rouletteCost();
+  b.disabled=G.save.crystals<c;
+  b.textContent='SPIN — '+c+' 💎';
+}
 function initRoulette(){
   const wheel=$('rouletteWheel');
   if(!wheel) return;
@@ -940,11 +1032,13 @@ function initRoulette(){
   });
   wheel.style.background='conic-gradient('+con.join(',')+')';
   wheel.style.setProperty('--segs',n);
+  updateRouletteUI();
 }
 function spinRoulette(){
   if(rouletteBusy) return;
-  if(G.save.crystals<10){ toast('Need 10 💎 to spin!','💎'); return; }
-  G.save.crystals-=10; G.save.roulette.spins++;
+  const cost=rouletteCost();
+  if(G.save.crystals<cost){ toast('Need '+cost+' 💎 to spin!','💎'); return; }
+  G.save.crystals-=cost; G.save.roulette.spins++;
   refreshHud(); rouletteBusy=true;
   const r=Math.random(); let acc=0,idx=0;
   for(let i=0;i<ROULETTE_SEGS.length;i++){ acc+=ROULETTE_SEGS[i].w; if(r<acc/100){ idx=i; break; } }
@@ -954,13 +1048,15 @@ function spinRoulette(){
   const wheel=$('rouletteWheel');
   wheel.style.transform='rotate('+rouletteRotation+'deg)';
   $('rouletteResult').textContent='Spinning…';
+  $('rouletteSpin').disabled=true;
   setTimeout(()=>{
     if(seg.boost){ G.save.suika.suikaBoost=true; $('rouletteResult').textContent='🍉 Suika Boost! Next run ×2!'; toast('Suika Boost! Next run ×2!','🍉'); }
     else if(seg.pay>0){
-      G.save.crystals+=seg.pay; G.save.roulette.wins++;
+      addCrystals(seg.pay); G.save.roulette.wins++;
+      if(seg.jackpot) G.save.roulette.jackpots=(G.save.roulette.jackpots||0)+1;
       $('rouletteResult').textContent='+'+seg.pay+' 💎!'; toast('Roulette win: +'+seg.pay+' 💎!','🎡');
     }else{ $('rouletteResult').textContent='RIP — nothing! 🫠'; toast('Roulette: nothing! 🫠','🎡'); }
-    refreshHud(); rouletteBusy=false; beepAch();
+    refreshHud(); rouletteBusy=false; beepAch(); checkAchievements();
     Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
   },3400);
 }
@@ -1028,7 +1124,7 @@ function collectEventReward(){
   if(G.save.eventClaimed===G.evt.id){ toast('Already claimed — enjoy the buff!','🎉'); return; }
   G.save.eventClaimed=G.evt.id;
   const c=5+Math.floor(Math.random()*11);
-  G.save.crystals+=c; gainXp(20);
+  addCrystals(c); gainXp(20);
   toast('Event reward: +'+c+' 💎!','🌟');
   refreshHud(); beepAch();
   Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
@@ -1216,6 +1312,96 @@ function whackEndGame(){
   whackFinish(whackScore);
 }
 
+/* ---------------- boss fights ---------------- */
+
+const BOSSES=[
+  {e:'👹',name:'Boss Watermelon'},
+  {e:'🐉',name:'Dragon Melon'},
+  {e:'🦈',name:'Sharkmelon'},
+  {e:'🤖',name:'Mech Melon'},
+  {e:'👾',name:'Void Fruit'}
+];
+let bossActive=false;
+function bossNextDelay(){ return (45+Math.random()*35)*60000; }
+function bossTierMult(){
+  const k=G.save.bossKills||0;
+  return 1+Math.max(0,k-3)*0.15+Math.min(3,k)*0.5;
+}
+function spawnBoss(){
+  const b=G.save.boss, k=G.save.bossKills||0;
+  const pick=BOSSES[Math.floor(Math.random()*BOSSES.length)];
+  b.id='b'+(k+1)+'_'+Date.now();
+  b.name=pick.name; b.emoji=pick.e;
+  b.tier=k+1;
+  b.maxHp=Math.ceil((8e4+2.4e5*k)*(1+level('as9')*0.05)*(1+shopLvl('sh8')*0.25))*bossTierMult();
+  b.hp=b.maxHp;
+  b.fightUntil=Date.now()+90000;
+  bossActive=true;
+  updateBossUI();
+  toast('BOSS '+pick.name+' attacks! '+pick.e+' Tap the boss to fight!','⚔️');
+  beepGolden();
+}
+function bossHit(){
+  if(!bossActive||!G.save.boss.hp) return;
+  G.save.boss.hp=Math.max(0,G.save.boss.hp-clickPower());
+  updateBossUI();
+  spawnJuice(innerWidth/2,innerHeight-190);
+  beepClick();
+  if(G.save.boss.hp<=0) bossDead();
+}
+function bossDead(){
+  const b=G.save.boss;
+  G.save.bossKills=(G.save.bossKills||0)+1;
+  bossActive=false;
+  const cry=Math.max(1,Math.floor(b.tier*(2.5+level('as9')*0.5)*(1+shopLvl('sh8')*0.25)));
+  addCrystals(cry); gainXp(20+b.tier*5);
+  const drops=Math.floor(1+b.tier*0.5);
+  dropCrate(drops);
+  toast('Boss defeated! +'+cry+' 💎 +'+drops+' 📦!','👑');
+  beepAscend();
+  refreshHud(); checkAchievements(); checkQuests(true);
+  Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
+  $('bossWrap').classList.add('hidden');
+  G.save.boss.nextAt=Date.now()+bossNextDelay();
+  updateBossTimer();
+}
+function updateBossUI(){
+  const w=$('bossWrap'); if(!w) return;
+  const b=G.save.boss;
+  if(!bossActive){ w.classList.add('hidden'); return; }
+  w.classList.remove('hidden');
+  $('bossEmoji').textContent=b.emoji;
+  $('bossName').textContent=b.name+' · T'+b.tier;
+  const pct=clamp(b.hp/b.maxHp*100,0,100);
+  $('bossHP').style.width=pct+'%';
+}
+function updateBossTimer(){
+  const t=$('bossTimer');
+  if(t) t.textContent='in '+fmtDur(Math.max(0,(G.save.boss.nextAt-Date.now())/1000));
+}
+function initBoss(){
+  const w=$('bossWrap'); if(!w) return;
+  w.addEventListener('pointerdown',e=>{ e.preventDefault(); bossHit(); });
+}
+function bossTick(){
+  const now=Date.now(), b=G.save.boss;
+  if(bossActive){
+    if(b.hp>0&&now>G.save.boss.fightUntil){
+      const w=$('bossWrap');
+      if(w&&!w.classList.contains('hidden')){
+        w.classList.add('hidden'); bossActive=false;
+        toast('The boss got away! '+b.emoji,'💨');
+        G.save.boss.nextAt=now+bossNextDelay();
+      }
+    }
+    return;
+  }
+  if(now>=b.nextAt&&G.save.name) spawnBoss();
+  if(G.tick%5===0) updateBossTimer();
+}
+function openTutorial(){ openModal('veilTutorial'); }
+function closeTutorial(){ closeModal('veilTutorial'); }
+
 /* ---------------- main loop ---------------- */
 
 function tick(){
@@ -1231,6 +1417,7 @@ function tick(){
   if(G.tick%100===0){ if(typeof Leaderboard!=='undefined') Leaderboard.throttledSubmit(); }
   if(G.tick%200===0) saveGame();
   if(G.tick%10===0) updateEventBanner();
+  bossTick();
   EVENTS_API.tick();
 }
 
@@ -1273,9 +1460,12 @@ function startGame(){
   bindEvents();
   initRoulette();
   initWhack();
+  initBoss();
   renderAll();
   scheduleGolden(25000);
   postBoot();
   setInterval(tick,100);
 }
+window.openTutorial=openTutorial;
+window.closeTutorial=closeTutorial;
 document.addEventListener('DOMContentLoaded',startGame);
