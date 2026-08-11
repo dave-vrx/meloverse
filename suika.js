@@ -71,7 +71,7 @@
   var watermelons = 0;
 
   var aimX = W / 2;
-  var touchAiming = false;
+  var pressAt = 0;
   var curType = randomRank();
   var nextType = randomRank();
   var dropLocked = false;
@@ -1100,27 +1100,17 @@
   canvas.addEventListener("pointerdown", function (e) {
     e.preventDefault();
     aimX = toCanvasX(e);
-    if (e.pointerType === "touch") {
-      touchAiming = true;
-      return;
-    }
-    if (gameOver) {
-      restart();
-      return;
-    }
-    dropAt(aimX);
+    pressAt = performance.now();
   });
 
   canvas.addEventListener("pointerup", function (e) {
-    if (e.pointerType === "touch" && touchAiming) {
-      touchAiming = false;
-      if (gameOver) restart();
-      else dropAt(aimX);
-    }
+    if (performance.now() - pressAt > 320) return;
+    if (gameOver) restart();
+    else dropAt(aimX);
   });
 
   canvas.addEventListener("pointercancel", function () {
-    touchAiming = false;
+    pressAt = 0;
   });
 
   canvas.addEventListener("touchstart", function (e) {
