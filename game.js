@@ -58,7 +58,9 @@ const ASC_UP=[
   {id:'as9', emoji:'👑', name:'Boss Slayer',    desc:'+50% boss rewards (per level)',               max:5,  base:12, mult:2},
   {id:'as10',emoji:'🎁', name:'Crate Magnet',   desc:'Crates drop 2× more often (per level)',       max:5,  base:10, mult:2},
   {id:'as11',emoji:'🌙', name:'Moon Blessing',  desc:'+25% offline earnings (per level)',           max:5,  base:15, mult:2},
-  {id:'as12',emoji:'💠', name:'Crystal Heart',  desc:'+2 💎 per ascension (per level)',             max:10, base:25, mult:1.8}
+  {id:'as12',emoji:'💠', name:'Crystal Heart',  desc:'+2 💎 per ascension (per level)',             max:10, base:25, mult:1.8},
+  {id:'as13',emoji:'🐠', name:'Fish Whisperer', desc:'+12% fishing luck (per level)',               max:5,  base:30, mult:1.9},
+  {id:'as14',emoji:'🏴‍☠️', name:'Pirate King',    desc:'+20% raid power (per level)',                max:5,  base:30, mult:1.9}
 ];
 
 const SHOP=[
@@ -71,7 +73,10 @@ const SHOP=[
   {id:'sh7', emoji:'📦', name:'Crate Magnet',    desc:'Crates 2× more likely to drop',      max:6,  base:10, mult:2},
   {id:'sh8', emoji:'🎯', name:'Lucky Strike',    desc:'+25% boss rewards',                  max:6,  base:12, mult:2},
   {id:'sh9', emoji:'🎡', name:'Spin Discount',   desc:'Roulette -1 💎 cost per level',      max:5,  base:8,  mult:2},
-  {id:'sh10',emoji:'💫', name:'Star Boost',      desc:'+50% mini game melons per level',    max:10, base:12, mult:1.9}
+  {id:'sh10',emoji:'💫', name:'Star Boost',      desc:'+50% mini game melons per level',    max:10, base:12, mult:1.9},
+  {id:'sh11',emoji:'🎣', name:'Reel Master',     desc:'+8% fishing luck per level',         max:10, base:15, mult:1.9},
+  {id:'sh12',emoji:'🏴‍☠️', name:'Raider',         desc:'+25% raid power per level',          max:6,  base:18, mult:2},
+  {id:'sh13',emoji:'🛡️', name:'Guard Dog',       desc:'+15% raid defense per level',        max:6,  base:15, mult:2}
 ];
 
 const SKINS=[
@@ -84,8 +89,14 @@ const SKINS=[
   {id:'void',    name:'Void Melon',     emoji:'⚫', price:2000, lvl:30, asc:0},
   {id:'royal',   name:'Royal Melon',    emoji:'👑', price:3000, lvl:40, asc:0},
   {id:'asc',     name:'Ascended Melon', emoji:'⭐', price:0,    lvl:0,  asc:3},
-  {id:'starbound',name:'Starbound Melon',emoji:'✨', price:0,   lvl:0,  asc:10},
-  {id:'cosmic',  name:'Cosmic Melon',   emoji:'🕳️', price:0,    lvl:0,  asc:25}
+  {id:'starbound',name:'Starbound Melon',emoji:'✨', price:0,    lvl:0,  asc:10},
+  {id:'cosmic',  name:'Cosmic Melon',   emoji:'🕳️', price:0,    lvl:0,  asc:25},
+  {id:'berry',   name:'Berry Melon',    emoji:'🍓', price:1500, lvl:15, asc:0},
+  {id:'peach',   name:'Peach Melon',    emoji:'🍑', price:1800, lvl:22, asc:0},
+  {id:'candy',   name:'Candy Melon',    emoji:'🍬', price:2500, lvl:35, asc:0},
+  {id:'toxic',   name:'Toxic Melon',    emoji:'☢️', price:3500, lvl:45, asc:0},
+  {id:'frost',   name:'Frost Melon',    emoji:'❄️', price:4500, lvl:55, asc:0},
+  {id:'inferno', name:'Inferno Melon',  emoji:'🔥', price:6000, lvl:70, asc:0}
 ];
 
 const QUESTS=[
@@ -118,8 +129,67 @@ const QUESTS=[
   {id:'q_lvl5',e:'🎓',n:'Rising Star',d:'Reach Level 5',cry:6,xp:60,need:()=>G.save.level>=5},
   {id:'q_lvl10',e:'🎓',n:'Scholar',d:'Reach Level 10',cry:10,xp:100,need:()=>G.save.level>=10},
   {id:'q_lvl25',e:'🧠',n:'Professor',d:'Reach Level 25',cry:20,xp:200,need:()=>G.save.level>=25},
-  {id:'q_seed100',e:'🌱',n:'Seed Collector',d:'Hold 100 total seeds',cry:15,xp:150,need:()=>G.save.totalSeeds>=100}
+  {id:'q_seed100',e:'🌱',n:'Seed Collector',d:'Hold 100 total seeds',cry:15,xp:150,need:()=>G.save.totalSeeds>=100},
+  {id:'q_fish1',e:'🐟',n:'First Catch',d:'Catch your first fish',cry:5,xp:50,need:()=>(G.save.fish.caught||0)>=1},
+  {id:'q_fish10',e:'🎣',n:'Angler',d:'Catch 10 fish',cry:8,xp:80,need:()=>(G.save.fish.caught||0)>=10},
+  {id:'q_fish50',e:'🎣',n:'Fisherfolk',d:'Catch 50 fish',cry:15,xp:150,need:()=>(G.save.fish.caught||0)>=50},
+  {id:'q_fish150',e:'🌊',n:'Sea Master',d:'Catch 150 fish',cry:25,xp:250,need:()=>(G.save.fish.caught||0)>=150},
+  {id:'q_fish300',e:'🐋',n:'Ocean Legend',d:'Catch 300 fish',cry:40,xp:400,need:()=>(G.save.fish.caught||0)>=300},
+  {id:'q_fish_coll10',e:'🗃️',n:'Explorer',d:'Discover 10 fish species',cry:6,xp:60,need:()=>Object.keys(G.save.fish.index).length>=10},
+  {id:'q_fish_coll40',e:'🗃️',n:'Deep Explorer',d:'Discover 40 fish species',cry:15,xp:150,need:()=>Object.keys(G.save.fish.index).length>=40},
+  {id:'q_fish_coll100',e:'🗺️',n:'Atlas of the Sea',d:'Discover 100 fish species',cry:30,xp:300,need:()=>Object.keys(G.save.fish.index).length>=100},
+  {id:'q_fish_coll175',e:'📖',n:'Fish Professor',d:'Discover 175 fish species',cry:50,xp:500,need:()=>Object.keys(G.save.fish.index).length>=175},
+  {id:'q_fish_collall',e:'🏆',n:'Fish Completionist',d:'Discover EVERY fish in the index',cry:80,xp:800,need:()=>Object.keys(G.save.fish.index).length>=Fishing.catalog().length},
+  {id:'q_fish_royal5',e:'👑',n:'Royalty of the Deep',d:'Catch 5 Royal fish',cry:15,xp:150,need:()=>(G.save.fish.royal||0)>=5},
+  {id:'q_fish_legendary',e:'✨',n:'Legendary Catch',d:'Catch a legendary or mythic fish',cry:20,xp:200,need:()=>Fishing&&fishCaughtRarity(['legendary','mythic'])},
+  {id:'q_fish_zone4',e:'🌌',n:'Abyssal Fisher',d:'Catch a Deep zone fish',cry:25,xp:250,need:()=>fishCaughtZone(4)},
+  {id:'q_fish_zone5',e:'🪐',n:'Cosmic Angler',d:'Catch a Galaxy zone fish',cry:40,xp:400,need:()=>fishCaughtZone(5)},
+  {id:'q_rod3',e:'🪙',n:'Copper Fisher',d:'Own the Copper Rod',cry:10,xp:100,need:()=>(G.save.fish.rod||0)>=2},
+  {id:'q_rod5',e:'🥇',n:'Gold Angler',d:'Own the Gold Rod',cry:20,xp:200,need:()=>(G.save.fish.rod||0)>=4},
+  {id:'q_rod7',e:'♾️',n:'Infinity Fisher',d:'Own the Infinity Rod',cry:60,xp:600,need:()=>(G.save.fish.rod||0)>=7},
+  {id:'q_raid1',e:'🏴‍☠️',n:'Pirate',d:'Win your first raid',cry:10,xp:100,need:()=>(G.save.pvp.won||0)>=1},
+  {id:'q_raid10',e:'🏴‍☠️',n:'Raider',d:'Win 10 raids',cry:20,xp:200,need:()=>(G.save.pvp.won||0)>=10},
+  {id:'q_raid50',e:'⚔️',n:'Scourge of the Sea',d:'Win 50 raids',cry:50,xp:500,need:()=>(G.save.pvp.won||0)>=50},
+  {id:'q_steal1k',e:'🪙',n:'Petty Thief',d:'Steal 1K melons in raids',cry:10,xp:100,need:()=>(G.save.pvp.stolen||0)>=1e3},
+  {id:'q_steal100k',e:'💰',n:'Buccaneer',d:'Steal 100K melons in raids',cry:30,xp:300,need:()=>(G.save.pvp.stolen||0)>=1e5},
+  {id:'q_steal10m',e:'👑',n:'Dread Pirate',d:'Steal 10M melons in raids',cry:80,xp:800,need:()=>(G.save.pvp.stolen||0)>=1e7},
+  {id:'q_balloon1',e:'🎈',n:'Pop Star',d:'Play Balloon Pop',cry:5,xp:50,need:()=>(G.save.balloon.games||0)>=1},
+  {id:'q_balloon30',e:'🎈',n:'Balloon Ace',d:'Score 30 in Balloon Pop',cry:10,xp:100,need:()=>(G.save.balloon.best||0)>=30},
+  {id:'q_balloon150',e:'🪙',n:'Balloon Legend',d:'Score 150 in Balloon Pop',cry:25,xp:250,need:()=>(G.save.balloon.best||0)>=150},
+  {id:'q_lvl50',e:'🧠',n:'Grandmaster',d:'Reach Level 50',cry:40,xp:400,need:()=>G.save.level>=50},
+  {id:'q_lvl100',e:'🌟',n:'Melon Genius',d:'Reach Level 100',cry:80,xp:800,need:()=>G.save.level>=100},
+  {id:'q_evt',e:'🎉',n:'Event Star',d:'Collect a global event reward',cry:10,xp:100,need:()=>!!G.save.eventClaimed},
+  {id:'q_roulette5',e:'🎡',n:'Wheel of Fate',d:'Spin the roulette 5 times',cry:10,xp:100,need:()=>(G.save.roulette.spins||0)>=5},
+  {id:'q_crates50',e:'📦',n:'Crate Addict',d:'Open 50 crates',cry:20,xp:200,need:()=>G.save.cratesOpened>=50},
+  {id:'q_cry100',e:'💎',n:'Crystal Star',d:'Earn 100 crystals',cry:15,xp:150,need:()=>(G.save.crystalsEarned||0)>=100},
+  {id:'q_cry1k',e:'💎',n:'Crystal Empire',d:'Earn 1,000 crystals',cry:40,xp:400,need:()=>(G.save.crystalsEarned||0)>=1000},
+  {id:'q_golden25',e:'🍀',n:'Gold Digger',d:'Click 25 golden melons',cry:15,xp:150,need:()=>G.save.goldenClicks>=25},
+  {id:'q_golden100',e:'🥇',n:'Golden Legend',d:'Click 100 golden melons',cry:40,xp:400,need:()=>G.save.goldenClicks>=100},
+  {id:'q_combo10',e:'🔥',n:'Combo Master',d:'Reach a ×10 combo',cry:10,xp:100,need:()=>G.save.maxCombo>=10},
+  {id:'q_combo20',e:'🌪️',n:'Combo God',d:'Reach a ×20 combo',cry:25,xp:250,need:()=>G.save.maxCombo>=20},
+  {id:'q_offline3',e:'💤',n:'Sleepy Farmer',d:'Earn melons while offline 3 times',cry:10,xp:100,need:()=>(G.save.offlineEarns||0)>=3},
+  {id:'q_whack2k',e:'🔨',n:'Whack Legend',d:'Score 2,000 in Whack-a-Melon',cry:20,xp:200,need:()=>(G.save.whack.best||0)>=2000},
+  {id:'q_suika4k',e:'🍉',n:'Suika Grandmaster',d:'Score 4,000 in a Suika run',cry:35,xp:350,need:()=>(G.save.suika.best||0)>=4000},
+  {id:'q_merges5k',e:'🔗',n:'Merge God',d:'Make 5,000 Suika merges',cry:30,xp:300,need:()=>(G.save.suika.merges||0)>=5000},
+  {id:'q_daily7',e:'📅',n:'Daily Devotee',d:'Reach a 7-day daily streak',cry:25,xp:250,need:()=>G.save.dailyStreak>=7},
+  {id:'q_asc50',e:'👑',n:'Multiversal',d:'Ascend 50 times',cry:90,xp:900,need:()=>G.save.ascensions>=50}
 ];
+
+/* generated milestone quests — building ownership + lifetime ranks */
+function buildGeneratedQuests(){
+  BUILDINGS.forEach(b=>{
+    QUESTS.push({id:'q_own_'+b.id,e:b.emoji,n:'Own a '+b.name,d:'Own 1 '+b.name,cry:2,xp:20,need:()=>(G.save.buildings[b.id]||0)>=1});
+    QUESTS.push({id:'q_own10_'+b.id,e:b.emoji,n:b.name+' Row',d:'Own 10 '+b.name+'s',cry:4,xp:40,need:()=>(G.save.buildings[b.id]||0)>=10});
+    QUESTS.push({id:'q_own50_'+b.id,e:b.emoji,n:b.name+' Fleet',d:'Own 50 '+b.name+'s',cry:8,xp:80,need:()=>(G.save.buildings[b.id]||0)>=50});
+  });
+  RANKS.forEach((r,i)=>{
+    if(i===0) return;
+    QUESTS.push({id:'q_rank'+i,e:r[2],n:'Reach '+r[1],d:'Reach '+fmt(r[0])+' lifetime melons',cry:3+i*2,xp:30+i*20,need:()=>G.save.lifetimeEarned>=r[0]});
+  });
+}
+
+function fishCaughtZone(z){ return Object.keys(G.save.fish.index).some(id=>{ const f=Fishing.byId(id); return f&&f.zone===z; }); }
+function fishCaughtRarity(rrs){ return Object.keys(G.save.fish.index).some(id=>{ const f=Fishing.byId(id); return f&&rrs.includes(f.rarity); }); }
 
 const DQ=[
   {id:'d_tap',e:'👆',n:'Tap Happy',t:'Tap the watermelon',goal:100,unit:' taps'},
@@ -135,7 +205,11 @@ const DQ=[
   {id:'d_golden',e:'🍀',n:'Golden Hunter',t:'Click golden melons',goal:2,unit:' melons'},
   {id:'d_boss',e:'👹',n:'Boss Buster',t:'Defeat bosses',goal:1,unit:' boss'},
   {id:'d_ascend',e:'⭐',n:'Ascender',t:'Ascend',goal:1,unit:' time'},
-  {id:'d_cry',e:'💎',n:'Crystal Collector',t:'Earn crystals',goal:10,unit:' 💎'}
+  {id:'d_cry',e:'💎',n:'Crystal Collector',t:'Earn crystals',goal:10,unit:' 💎'},
+  {id:'d_fish',e:'🐟',n:'Fisher',t:'Catch fish',goal:5,unit:' fish'},
+  {id:'d_fishking',e:'👑',n:'Royal Fisher',t:'Catch Royal fish',goal:1,unit:' fish'},
+  {id:'d_raid',e:'🏴‍☠️',n:'Pirate',t:'Win a raid',goal:1,unit:' raid'},
+  {id:'d_balloon',e:'🎈',n:'Popper',t:'Play Balloon Pop',goal:1,unit:' time'}
 ];
 
 const ITEMS=[
@@ -178,7 +252,27 @@ const ITEMS=[
   {id:'goddess',e:'🧚',n:'Melon Goddess',r:'legendary'},
   {id:'heart',e:'💖',n:'Crystal Heart',r:'legendary'},
   {id:'multiv',e:'🌌',n:'Multiverse Key',r:'mythic'},
-  {id:'melonking',e:'👑',n:'Melon King Crown',r:'mythic'}
+  {id:'melonking',e:'👑',n:'Melon King Crown',r:'mythic'},
+  {id:'worm',e:'🪱',n:'Juicy Worm',r:'common'},
+  {id:'boot',e:'🥾',n:'Old Fishing Boot',r:'common'},
+  {id:'seaweed',e:'🌿',n:'Seaweed Snack',r:'common'},
+  {id:'driftwood',e:'🪵',n:'Driftwood',r:'common'},
+  {id:'bucket',e:'🪣',n:'Bait Bucket',r:'common'},
+  {id:'line',e:'🧵',n:'Fishing Line',r:'uncommon'},
+  {id:'hook',e:'🪝',n:'Lucky Hook',r:'uncommon'},
+  {id:'bobber',e:'🔴',n:'Glowing Bobber',r:'uncommon'},
+  {id:'lure',e:'🪰',n:'Fancy Lure',r:'uncommon'},
+  {id:'reel',e:'🎛️',n:'Golden Reel',r:'rare'},
+  {id:'tackle',e:'🧰',n:'Master Tacklebox',r:'rare'},
+  {id:'shell',e:'🐚',n:'Singing Conch',r:'rare'},
+  {id:'compass',e:'🧭',n:'Tide Compass',r:'epic'},
+  {id:'treasure',e:'🪙',n:'Sunken Treasure',r:'epic'},
+  {id:'map',e:'🗺️',n:'Pirate Map',r:'epic'},
+  {id:'anchor',e:'⚓',n:'Mythic Anchor',r:'legendary'},
+  {id:'flag',e:'🏴',n:'Raider Flag',r:'legendary'},
+  {id:'oar',e:'🛶',n:'King Tide Oar',r:'legendary'},
+  {id:'net',e:'🥅',n:'Cosmic Net',r:'mythic'},
+  {id:'leviathan',e:'🐋',n:'Leviathan Tooth',r:'mythic'}
 ];
 const RARITY={common:{w:54,v:1,c:'#a8c0ae'},uncommon:{w:25,v:3,c:'#7fe7ff'},rare:{w:12,v:8,c:'#c39bd3'},epic:{w:6,v:20,c:'#ff9de8'},legendary:{w:2,v:50,c:'#ffd24a'},mythic:{w:1,v:150,c:'#ff6b9d'}};
 
@@ -352,7 +446,7 @@ function globalMult(){
   m*=levelMult();
   return m;
 }
-function seedMult(){ return 1+0.01*(1+level('as1'))*G.save.totalSeeds; }
+function seedMult(){ return 1+0.005*(1+level('as1'))*G.save.totalSeeds; }
 function clickMult(){
   let m=1;
   for(const u of UPGRADES) if(u.kind==='click'&&owned(u.id)) m*=u.mult;
@@ -371,7 +465,7 @@ function autoPerSec(){ return (shopLvl('sh1')+level('as8'))*clickPower(); }
 function frenzyMult(){ return (Date.now()<G.frenzyUntil)?7:1; }
 function eventProdMult(){ return (G.evt&&(G.evt.id==='meteor'||G.evt.id==='turbo'))?2:1; }
 function effectivePerSec(){ return perSecRaw()*globalMult()*seedMult()*frenzyMult()*eventProdMult()+autoPerSec(); }
-function calcSeedGain(){ return Math.floor(Math.pow(G.save.runEarned/1e7,0.45)*(1+0.25*level('as2'))); }
+function calcSeedGain(){ return Math.floor(Math.pow(G.save.runEarned/1e7,0.35)*(1+0.25*level('as2'))); }
 function rankInfo(){
   let i=0;
   for(let r=0;r<RANKS.length;r++) if(G.save.lifetimeEarned>=RANKS[r][0]) i=r;
@@ -395,6 +489,9 @@ function defaultSave(){
     coll:{},inv:0,cratesOpened:0,skins:[],skin:'classic',
     suika:{best:0,games:0,merges:0,watermelons:0,suikaBoost:false},
     whack:{best:0,games:0},    roulette:{spins:0,wins:0,jackpots:0},
+    fish:{rod:0,best:0,games:0,caught:0,royal:0,index:{}},
+    balloon:{best:0,games:0},
+    pvp:{raids:0,won:0,stolen:0,defended:0,lost:0,lastRaid:0},
     eventClaimed:'',lastEventEnd:0,
     boss:{id:null,name:'',emoji:'👹',hp:0,maxHp:0,nextAt:Date.now()+2400000,tier:1,kills:0,fightUntil:0}};
 }
@@ -419,6 +516,9 @@ function loadGame(){
   G.save.suika=Object.assign({best:0,games:0,merges:0,watermelons:0,suikaBoost:false},G.save.suika||{});
   G.save.whack=Object.assign({best:0,games:0},G.save.whack||{});
   G.save.roulette=Object.assign({spins:0,wins:0,jackpots:0},G.save.roulette||{});
+  G.save.fish=Object.assign({rod:0,best:0,games:0,caught:0,royal:0,index:{}},G.save.fish||{});
+  G.save.balloon=Object.assign({best:0,games:0},G.save.balloon||{});
+  G.save.pvp=Object.assign({raids:0,won:0,stolen:0,defended:0,lost:0,lastRaid:0},G.save.pvp||{});
   G.save.boss=Object.assign({id:null,name:'',emoji:'👹',hp:0,maxHp:0,nextAt:Date.now()+2400000,tier:1,kills:0,fightUntil:0},G.save.boss||{});
   G.save.level=G.save.level||1;
   G.save.xp=G.save.xp||0;
@@ -490,6 +590,7 @@ function setView(v){
   if(v==='quests'){ renderQuestTab(); renderCollection(); renderInventory(); }
   if(v==='chat'&&typeof Chat!=='undefined') Chat.onOpen();
   if(v==='grow') updateEventBanner();
+  if(v==='board'&&typeof PVP!=='undefined') PVP.render();
   if(v!=='mini'&&typeof window.suikaPause==='function') window.suikaPause();
   window.scrollTo(0,0);
   const m=document.querySelector('main'); if(m) m.scrollTop=0;
@@ -507,8 +608,9 @@ function switchGrowTab(t){
 }
 function switchMiniTab(m){
   document.querySelectorAll('#miniTabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
-  ['suika','whack','roulette'].forEach(x=>$('mini-'+x).classList.toggle('on',x===m));
+  ['suika','whack','roulette','fishing','balloon'].forEach(x=>{ const el=$('mini-'+x); if(el) el.classList.toggle('on',x===m); });
   if(m==='roulette') setTimeout(layoutRoulette,50);
+  if(m==='fishing'&&typeof Fishing!=='undefined') Fishing.render();
 }
 
 function refreshHud(){
@@ -787,7 +889,7 @@ function rollDailyQuests(){
   while(pick.length<4&&pool.length){ const i=Math.floor(Math.random()*pool.length); pick.push(pool.splice(i,1)[0]); }
   G.save.dqIds=pick.map(q=>q.id);
   G.save.dqProg={}; G.save.dqDone=[];
-  G.save.dqBase={ grow:G.save.lifetimeEarned, combo:G.save.maxCombo, golden:G.save.goldenClicks, crates:G.save.cratesOpened, suika:G.save.suika.games, whack:G.save.whack.games, merges:G.save.suika.merges, score:G.save.suika.best, whackscore:G.save.whack.best, boss:(G.save.bossKills||0), asc:G.save.ascensions, cry:(G.save.crystalsEarned||0), buy:0, tap:0 };
+  G.save.dqBase={ grow:G.save.lifetimeEarned, combo:G.save.maxCombo, golden:G.save.goldenClicks, crates:G.save.cratesOpened, suika:G.save.suika.games, whack:G.save.whack.games, merges:G.save.suika.merges, score:G.save.suika.best, whackscore:G.save.whack.best, boss:(G.save.bossKills||0), asc:G.save.ascensions, cry:(G.save.crystalsEarned||0), buy:0, tap:0, fish:(G.save.fish.caught||0), fishking:(G.save.fish.royal||0), raid:(G.save.pvp.won||0), balloon:(G.save.balloon.games||0) };
   G.save.dqDay=new Date().toDateString();
   renderQuestTab();
 }
@@ -834,6 +936,10 @@ function dqProgress(id){
   if(id==='d_boss') return Math.max(0,(G.save.bossKills||0)-(G.save.dqBase.boss||0));
   if(id==='d_ascend') return Math.max(0,G.save.ascensions-(G.save.dqBase.asc||0));
   if(id==='d_cry') return Math.max(0,(G.save.crystalsEarned||0)-(G.save.dqBase.cry||0));
+  if(id==='d_fish') return Math.max(0,(G.save.fish.caught||0)-(G.save.dqBase.fish||0));
+  if(id==='d_fishking') return Math.max(0,(G.save.fish.royal||0)-(G.save.dqBase.fishking||0));
+  if(id==='d_raid') return Math.max(0,(G.save.pvp.won||0)-(G.save.dqBase.raid||0));
+  if(id==='d_balloon') return Math.max(0,(G.save.balloon.games||0)-(G.save.dqBase.balloon||0));
   return 0;
 }
 function renderQuestTab(){
@@ -1010,7 +1116,7 @@ window.suikaIdleFinish=function(score,stats){
   const boost=G.save.suika.suikaBoost?2:1;
   G.save.suika.suikaBoost=false;
   const mult=miniRewardMult()*boost;
-  const m=Math.floor(score*12*mult);
+  const m=Math.floor(score*8*mult);
   addMelons(m); gainXp(Math.floor(score/3*mult));
   let cry=0;
   if(score>=2000) cry+=3;
@@ -1028,7 +1134,7 @@ function whackFinish(score){
   G.save.whack.games++;
   if(score>G.save.whack.best) G.save.whack.best=score;
   const mult=miniRewardMult();
-  const m=Math.floor(score*5*mult);
+  const m=Math.floor(score*4*mult);
   addMelons(m); gainXp(Math.floor(score/4*mult));
   if(score>=100) dropCrate(1);
   toast('Whack run: +'+fmt(m)+' melons!','🔨');
@@ -1219,6 +1325,7 @@ function postBoot(){
   checkOffline();
   checkDaily();
   initInstallBtn();
+  if(typeof PVP!=='undefined') PVP.init();
 }
 
 /* ---------------- particles ---------------- */
@@ -1374,6 +1481,71 @@ function whackEndGame(){
   whackFinish(whackScore);
 }
 
+/* ---------------- balloon pop ---------------- */
+
+let balloonRun=false,balloonScore=0,balloonEnd=0,balloonIv=null,balloonTv=null;
+function initBalloon(){
+  const area=$('balloonArea');
+  if(!area) return;
+  $('balloonStart').addEventListener('click',()=>{
+    if(balloonRun) return;
+    balloonRun=true; balloonScore=0; balloonEnd=Date.now()+20000;
+    $('balloonScore').textContent='0'; $('balloonTimer').textContent='20s';
+    $('balloonStart').textContent='GO!';
+    if(window.scrollGameIntoView) window.scrollGameIntoView('.balloon-area');
+    balloonIv=setInterval(()=>spawnBalloon(),620);
+    balloonTv=setInterval(()=>{
+      const l=Math.max(0,Math.ceil((balloonEnd-Date.now())/1000));
+      $('balloonTimer').textContent=l+'s';
+      if(l<=0) balloonEndGame();
+    },200);
+  });
+}
+function spawnBalloon(){
+  if(!balloonRun) return;
+  const area=$('balloonArea'); if(!area) return;
+  const n=1+Math.floor(Math.random()*2);
+  for(let i=0;i<n;i++){
+    const gold=Math.random()<0.18;
+    const el=document.createElement('button');
+    el.className='balloon'+(gold?' gold':'');
+    el.textContent=gold?'🪙':'🎈';
+    el.style.left=(8+Math.random()*84)+'%';
+    el.style.bottom='-58px';
+    el.addEventListener('pointerdown',e=>{ e.preventDefault(); popBalloon(el,gold); });
+    area.appendChild(el);
+    setTimeout(()=>{ if(el.parentNode) el.remove(); },(3400+Math.random()*1400));
+  }
+}
+function popBalloon(el,gold){
+  if(!balloonRun) return;
+  balloonScore+=gold?5:1;
+  $('balloonScore').textContent=balloonScore;
+  spawnJuice(el.offsetLeft+el.offsetWidth/2,el.offsetTop+el.offsetHeight/2);
+  beepClick();
+  el.remove();
+}
+function balloonEndGame(){
+  if(!balloonRun) return;
+  balloonRun=false;
+  clearInterval(balloonIv); clearInterval(balloonTv);
+  document.querySelectorAll('#balloonArea .balloon').forEach(el=>el.remove());
+  $('balloonStart').textContent='Start!';
+  $('balloonTimer').textContent='20s';
+  balloonFinish(balloonScore);
+}
+function balloonFinish(score){
+  G.save.balloon.games=(G.save.balloon.games||0)+1;
+  if(score>G.save.balloon.best) G.save.balloon.best=score;
+  const mult=miniRewardMult();
+  const m=Math.floor(score*4*mult);
+  addMelons(m); gainXp(Math.floor(score/4*mult));
+  if(score>=50) dropCrate(1);
+  toast('Balloon run: +'+fmt(m)+' melons!','🎈');
+  refreshHud(); checkAchievements(); checkQuests(true);
+  Leaderboard&&Leaderboard.bump&&Leaderboard.bump();
+}
+
 /* ---------------- boss fights ---------------- */
 
 const BOSSES=[
@@ -1498,6 +1670,7 @@ function tick(){
   if(G.tick%10===0) updateEventBanner();
   bossTick();
   EVENTS_API.tick();
+  if(typeof PVP!=='undefined') PVP.tick();
 }
 
 function bindEvents(){
@@ -1535,11 +1708,14 @@ function startGame(){
   initRoulette();
   initWhack();
   initBoss();
+  initBalloon();
   renderAll();
   scheduleGolden(25000);
   postBoot();
+  if(typeof Fishing!=='undefined') Fishing.init();
   setInterval(tick,100);
 }
 window.openTutorial=openTutorial;
 window.closeTutorial=closeTutorial;
+buildGeneratedQuests();
 document.addEventListener('DOMContentLoaded',startGame);

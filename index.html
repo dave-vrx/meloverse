@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20260811b">
+<link rel="stylesheet" href="style.css?v=20260811c">
 </head>
 <body data-view="grow">
 
@@ -145,6 +145,8 @@
       <button data-m="suika" class="on">🍉 Suika</button>
       <button data-m="whack">🔨 Whack</button>
       <button data-m="roulette">🎡 Roulette</button>
+      <button data-m="fishing">🎣 Fish</button>
+      <button data-m="balloon">🎈 Pop</button>
     </nav>
 
     <div id="mini-suika" class="mini on">
@@ -203,6 +205,42 @@
         <button class="btn-primary" id="rouletteSpin" onclick="spinRoulette()">🎡 Spin — 10 💎</button>
         <p class="game-hint">Wheels of fortune! Win up to 100 💎 or boost your next Suika run. Your crystals balance updates live on the leaderboard.</p>
       </div>
+    </div>
+
+    <div id="mini-fishing" class="mini">
+      <div class="fish-card">
+        <div class="fish-head">
+          <div class="fish-rod">
+            <div class="fish-rod-name" id="fishRodName">🥢 Twig Rod</div>
+            <div class="fish-rod-next" id="fishRodNext"></div>
+          </div>
+          <button class="btn-ghost btn-sm" id="fishUpgradeBtn">⬆️ Upgrade</button>
+        </div>
+        <div class="fish-water">
+          <div class="fish-zone" id="fishZoneName">Waters: Pond → Pond 🌿</div>
+          <button class="fish-bobber" id="fishBobber" aria-label="bobber">🎣</button>
+          <div class="fish-cast-hint">Cast, wait for the bite, then tap the bar when the marker is in the green!</div>
+        </div>
+        <div class="fish-reel hidden" id="fishTrack">
+          <div class="fish-sweet" id="fishSweet"></div>
+          <div class="fish-marker" id="fishMarker"></div>
+        </div>
+        <button class="btn-primary btn-block" id="fishCastBtn">🎣 Cast</button>
+        <div class="fish-status" id="fishStatus">Ready to fish!</div>
+        <div class="fish-stats" id="fishStats">🐟 0 caught</div>
+        <button class="btn-ghost btn-sm" id="fishIndexBtn">🐟 Open Fish Index</button>
+        <p class="game-hint">Upgrade rods to unlock deeper waters and rarer fish. Every catch fills your fish index — 200+ fish to discover!</p>
+      </div>
+    </div>
+
+    <div id="mini-balloon" class="mini">
+      <div class="balloon-head">
+        <div class="sstat"><span>⏱️ Time</span><b id="balloonTimer">20s</b></div>
+        <div class="sstat"><span>🎈 Score</span><b id="balloonScore">0</b></div>
+        <button class="btn-primary" id="balloonStart">Start!</button>
+      </div>
+      <div class="balloon-area" id="balloonArea"></div>
+      <p class="game-hint">Pop the balloons before they float away! Gold coins 🪙 are worth ×5. Score becomes melons + drops.</p>
     </div>
   </section>
 
@@ -283,6 +321,19 @@
       <button class="btn-danger btn-sm" onclick="clearLeaderboard()">🌌 Clear Entire Leaderboard</button>
       <div class="reset-note">Wipes the whole board in the cloud. Other farmers will re-appear as they come back online.</div>
     </div>
+
+    <div class="quest-block raid-block">
+      <h3>🏴‍☠️ Raid Farmers</h3>
+      <p class="quest-hint">Every farmer's idle production slowly fills their guarded stash. Raid others to steal melons — win by out-powering their defense!</p>
+      <div class="raid-stats">
+        <div><span>⚔️ Power</span><b id="raidPower">0</b></div>
+        <div><span>🛡️ Defense</span><b id="raidDef">0</b></div>
+        <div><span>🏴‍☠️ Stash</span><b id="raidStash">…</b></div>
+      </div>
+      <button class="btn-primary btn-block" id="raidBtn" onclick="PVP.raid()">⚔️ Raid a Farmer</button>
+      <div class="raid-result" id="raidResult">Ready to raid!</div>
+      <div class="reset-note">Your stash grows with 5% of your idle production. Raid cooldown: 1 min. Boost power with the 🏴‍☠️ Raider perk and 🛡️ Guard Dog raises your defense.</div>
+    </div>
   </section>
 
   <!-- ===== CHAT ===== -->
@@ -351,8 +402,17 @@
 
     <div class="about-box">
       <div class="about-brand">🍉 SUIKA<span>VERSE</span></div>
-      <p>The all-in-one watermelon multiverse: idle farming, Suika stacking, mini games, quests, collection, bosses, skins and a live global chat + leaderboard.</p>
+      <p>The all-in-one watermelon multiverse: idle farming, Suika stacking, fishing, raids, mini games, quests, collection, bosses, skins and a live global chat + leaderboard.</p>
       <p>Made with 💚 by <b>Dave-VR</b> — not affiliated with any other game or its creators.</p>
+    </div>
+
+    <div class="quest-block">
+      <h3>💜 Beta Testers</h3>
+      <p class="quest-hint">A huge thank-you to the first farmers who tested, broke and helped shape SUIKAVERSE:</p>
+      <div class="beta-row"><span>👑</span><div><b>witchychick</b><p>Founding beta tester</p></div></div>
+      <div class="beta-row"><span>🥈</span><div><b>Andrew VR</b><p>Founding beta tester</p></div></div>
+      <div class="beta-row"><span>🥉</span><div><b>ayyjabooty</b><p>Founding beta tester</p></div></div>
+      <div class="beta-row"><span>🦈</span><div><b>Skull</b><p>Founding beta tester</p></div></div>
     </div>
 
     <footer id="footer">🍉 <b>SUIKA</b><b style="color:var(--acc)">VERSE</b> — watermelon idle multiverse &nbsp;·&nbsp; Made with 💚 by <b>Dave-VR</b></footer>
@@ -421,6 +481,31 @@
   </div>
 </div>
 
+<div class="modal-veil hidden" id="veilFish">
+  <div class="modal modal-wide">
+    <div class="modal-emoji">🐟</div>
+    <h1>Fish Index</h1>
+    <p class="modal-sub" id="fishIndexCount">0 / 204 discovered</p>
+    <div class="fish-zones" id="fishZoneChips"></div>
+    <div class="fish-grid" id="fishGrid"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeModal('veilFish')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-veil hidden" id="veilFishCatch">
+  <div class="modal">
+    <div class="modal-emoji" id="fishCatchName">🐟</div>
+    <h1 id="fishCatchZone">Catch!</h1>
+    <p class="modal-sub" id="fishCatchReward"></p>
+    <div class="fish-new" id="fishCatchNew">✨ New fish! Added to your index!</div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeModal('veilFishCatch')">Nice!</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-veil hidden" id="veilDaily">
   <div class="modal">
     <div class="modal-emoji">🎁</div>
@@ -482,9 +567,11 @@
   </div>
 </div>
 
-<script src="game.js?v=20260811b"></script>
-<script src="leaderboard.js?v=20260811b"></script>
-<script src="chat.js?v=20260811b"></script>
-<script src="suika.js?v=20260811b"></script>
+<script src="fishing.js?v=20260811c"></script>
+<script src="pvp.js?v=20260811c"></script>
+<script src="game.js?v=20260811c"></script>
+<script src="leaderboard.js?v=20260811c"></script>
+<script src="chat.js?v=20260811c"></script>
+<script src="suika.js?v=20260811c"></script>
 </body>
 </html>

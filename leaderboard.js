@@ -171,6 +171,7 @@ const Leaderboard = (()=>{
   }
 
   function refresh(){ fetchBoard(); }
+  function getScores(){ return scores.slice(); }
 
   function init(){
     getMyId();
@@ -179,5 +180,5 @@ const Leaderboard = (()=>{
     setInterval(()=>{ if(typeof G!=='undefined'&&G.save) submit(false); },20000);
   }
 
-  return {init,refresh,submit,bump,throttledSubmit,onNameChange,render,removeMe,clearAll};
+  return {init,refresh,submit,bump,throttledSubmit,onNameChange,render,removeMe,clearAll,getScores};
 })();
