@@ -126,6 +126,21 @@ const Leaderboard = (()=>{
     }catch(e){ return false; }
   }
 
+  async function clearAll(){
+    try{
+      const r=await fetch(URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({scores:[],updated:Date.now()})
+      });
+      if(!r.ok) return false;
+      scores=[];
+      render();
+      setStatus('🌌 Leaderboard cleared');
+      return true;
+    }catch(e){ return false; }
+  }
+
   function render(){
     const list=document.getElementById('lbList');
     if(!list) return;
@@ -164,5 +179,5 @@ const Leaderboard = (()=>{
     setInterval(()=>{ if(typeof G!=='undefined'&&G.save) submit(false); },20000);
   }
 
-  return {init,refresh,submit,bump,throttledSubmit,onNameChange,render,removeMe};
+  return {init,refresh,submit,bump,throttledSubmit,onNameChange,render,removeMe,clearAll};
 })();

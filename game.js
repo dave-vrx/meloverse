@@ -1203,6 +1203,12 @@ async function resetGame(){
 }
 
 let booted=false;
+async function clearLeaderboard(){
+  if(!confirm('Clear the ENTIRE global leaderboard?\nThis removes every farmer\'s score from the cloud — it can\'t be undone.')) return;
+  const ok=await Leaderboard.clearAll();
+  if(ok){ setView('board'); toast('🌌 Leaderboard cleared'); Leaderboard.refresh(); }
+  else toast('⚠️ Could not clear leaderboard — check connection and try again');
+}
 function postBoot(){
   if(booted) return;
   if(!G.save.name){ openNameModal(); return; }

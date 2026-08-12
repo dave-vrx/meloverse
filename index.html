@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20260811">
+<link rel="stylesheet" href="style.css?v=20260811b">
 </head>
 <body data-view="grow">
 
@@ -277,6 +277,11 @@
       <p class="quest-hint">Start fresh: wipe all progress on this device <b>and</b> remove your score from the global leaderboard.</p>
       <button class="btn-danger" onclick="resetGame()">🗑️ Reset All &amp; Clear My Score</button>
       <div class="reset-note">Crystals, farms, quests, collection and your leaderboard entry are removed — you'll begin as a brand-new farmer.</div>
+      <div class="settings-divider"></div>
+      <h3>🌌 Global Board</h3>
+      <p class="quest-hint">Remove <b>every</b> farmer's score from the shared multiverse. This affects everyone playing!</p>
+      <button class="btn-danger btn-sm" onclick="clearLeaderboard()">🌌 Clear Entire Leaderboard</button>
+      <div class="reset-note">Wipes the whole board in the cloud. Other farmers will re-appear as they come back online.</div>
     </div>
   </section>
 
@@ -382,31 +387,37 @@
 
 <!-- ======= MODALS ======= -->
 <div class="modal-veil hidden" id="veilName">
-  <div class="modal">
-    <div class="modal-emoji">🍉</div>
-    <h1>Welcome to SUIKAVERSE</h1>
-    <p class="modal-sub">Enter your name to join the galaxy board &amp; chat.<br>Progress is saved on this device — no account needed.</p>
-    <input id="nameInput" maxlength="16" placeholder="Your melon farmer name…" autocomplete="off">
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="submitName()">🚀 Enter the Multiverse</button>
+  <div class="modal modal-welcome">
+    <div class="welcome-badge">🍉</div>
+    <h1 class="welcome-title">Welcome to <span>SUIKA</span>VERSE</h1>
+    <p class="modal-sub">Your watermelon multiverse is ready.<br>Pick a name and jump in!</p>
+    <div class="name-field">
+      <span class="name-icon">👤</span>
+      <input id="nameInput" maxlength="16" placeholder="Your melon farmer name" autocomplete="off" oninput="document.getElementById('nameLen').textContent=this.value.length+'/16'">
+      <span class="name-len" id="nameLen">0/16</span>
     </div>
-    <button class="btn-ghost install-btn" id="installBtn" onclick="showInstallHelp()">📲 Add to Home Screen</button>
-    <div class="modal-hint">Tip: tap the watermelon to harvest! Then play Suika to stack even more.</div>
+    <button class="btn-primary btn-block" onclick="submitName()">🚀 Enter the Multiverse</button>
+    <div class="welcome-feats">
+      <div><span>🧺</span>Idle farm &amp; the full Suika game</div>
+      <div><span>🏆</span>Live global leaderboard &amp; chat</div>
+      <div><span>🔒</span>No account — auto-saves on this device</div>
+    </div>
+    <div class="welcome-divider"></div>
+    <button class="install-btn" id="installBtn" onclick="showInstallHelp()">📲 <span>Add to Home Screen</span><em>install</em></button>
   </div>
 </div>
 
 <div class="modal-veil hidden" id="veilInstall">
-  <div class="modal">
-    <div class="modal-emoji">📲</div>
-    <h1>Install SUIKAVERSE</h1>
-    <div class="tut-steps">
-      <div class="tut-step"><span class="ts-emoji">1️⃣</span><div><div class="ts-title">Tap the Share button</div><div class="ts-desc">It's the square-with-arrow at the bottom of the browser.</div></div></div>
-      <div class="tut-step"><span class="ts-emoji">2️⃣</span><div><div class="ts-title">Choose “Add to Home Screen”</div><div class="ts-desc">Scroll the Share menu and tap it. Give it a name if you like.</div></div></div>
-      <div class="tut-step"><span class="ts-emoji">3️⃣</span><div><div class="ts-title">Tap Add</div><div class="ts-desc">SUIKAVERSE now opens full-screen from your home screen — just like a real app!</div></div></div>
+  <div class="modal modal-install">
+    <div class="welcome-badge install-badge">📲</div>
+    <h1 class="welcome-title">Add to your <span>Home Screen</span></h1>
+    <p class="modal-sub">Install SUIKAVERSE like a real app — full screen, no browser bar.</p>
+    <div class="install-steps">
+      <div class="istep"><span class="istep-num">1</span><div><b>Tap the Share button</b><p>It's the square-with-arrow at the bottom of your browser.</p></div></div>
+      <div class="istep"><span class="istep-num">2</span><div><b>“Add to Home Screen”</b><p>Scroll down the Share menu and tap it.</p></div></div>
+      <div class="istep"><span class="istep-num">3</span><div><b>Tap Add</b><p>SUIKAVERSE now opens full-screen from your home screen — just like a real app!</p></div></div>
     </div>
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="closeModal('veilInstall')">Got it! 🍉</button>
-    </div>
+    <button class="btn-primary btn-block" onclick="closeModal('veilInstall')">Got it! 🍉</button>
   </div>
 </div>
 
@@ -471,9 +482,9 @@
   </div>
 </div>
 
-<script src="game.js?v=20260811"></script>
-<script src="leaderboard.js?v=20260811"></script>
-<script src="chat.js?v=20260811"></script>
-<script src="suika.js?v=20260811"></script>
+<script src="game.js?v=20260811b"></script>
+<script src="leaderboard.js?v=20260811b"></script>
+<script src="chat.js?v=20260811b"></script>
+<script src="suika.js?v=20260811b"></script>
 </body>
 </html>
