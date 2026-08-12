@@ -425,7 +425,7 @@ canvas#suikaCanvas{display:block;width:100%;height:auto;touch-action:none;backgr
 }
 .balloon.gold{font-size:2.4rem}
 @keyframes balloonRise{from{transform:translateY(0)}to{transform:translateY(-58vh)}}
-.balloon{animation-name:balloonRise;animation-timing-function:linear}
+.balloon{animation-name:balloonRise;animation-timing-function:linear;animation-duration:3.8s}
 
 /* ---------------- raids ---------------- */
 .raid-block{text-align:center}

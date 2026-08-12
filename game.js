@@ -1512,6 +1512,7 @@ function spawnBalloon(){
     el.textContent=gold?'🪙':'🎈';
     el.style.left=(8+Math.random()*84)+'%';
     el.style.bottom='-58px';
+    el.style.animationDuration=(3400+Math.random()*1400)+'ms';
     el.addEventListener('pointerdown',e=>{ e.preventDefault(); popBalloon(el,gold); });
     area.appendChild(el);
     setTimeout(()=>{ if(el.parentNode) el.remove(); },(3400+Math.random()*1400));
@@ -1567,7 +1568,8 @@ function spawnBoss(){
   b.id='b'+(k+1)+'_'+Date.now();
   b.name=pick.name; b.emoji=pick.e;
   b.tier=k+1;
-  b.maxHp=Math.ceil((8e4+2.4e5*k)*(1+level('as9')*0.05)*(1+shopLvl('sh8')*0.25))*bossTierMult();
+  const taps=45+25*Math.min(k,10);
+  b.maxHp=Math.ceil(Math.max(50,clickPower()*taps)*(1+level('as9')*0.05)*(1+shopLvl('sh8')*0.25))*bossTierMult();
   b.hp=b.maxHp;
   b.fightUntil=Date.now()+90000;
   bossActive=true;

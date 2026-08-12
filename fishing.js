@@ -286,10 +286,10 @@ const Fishing=(()=>{
       track.dataset.bound='1';
       track.addEventListener('pointerdown',e=>{ e.preventDefault(); reelIn(); });
     }
-    const cast=el('fishCastBtn');
-    if(cast&&!cast.dataset.bound){
-      cast.dataset.bound='1';
-      cast.addEventListener('click',()=>cast());
+    const btn=el('fishCastBtn');
+    if(btn&&!btn.dataset.bound){
+      btn.dataset.bound='1';
+      btn.addEventListener('click',()=>cast());
     }
     const up=el('fishUpgradeBtn');
     if(up&&!up.dataset.bound){
